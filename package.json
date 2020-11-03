@@ -1,0 +1,24 @@
+{
+  "name": "graphql-offline",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^14.14.6",
+    "@types/node-fetch": "^2.5.7",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.5"
+  },
+  "dependencies": {
+    "graphql": "0.13.2",
+    "join-monster": "^2.1.2",
+    "knex": "^0.21.12",
+    "node-fetch": "^2.6.1",
+    "sqlite3": "^5.0.0"
+  },
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "db": "yarn knex --knexfile src/knexfile.ts",
+    "dump": "ts-node src/cli/dump.ts"
+  }
+}

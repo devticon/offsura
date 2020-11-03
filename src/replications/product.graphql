@@ -1,0 +1,15 @@
+query pullProducts ($timestamp: timestamptz! $limit: Int! = 50){
+    pos_products (
+        order_by: {updated_at: asc}
+        limit: $limit
+        where: {updated_at: {_gt: $timestamp}}
+    ){
+        id
+        name
+        price
+        updated_at
+        categories {
+            categoryId
+        }
+    }
+}

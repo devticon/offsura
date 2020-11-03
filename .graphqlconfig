@@ -1,0 +1,10 @@
+{
+  "schemaPath": "schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "default": {
+        "url": "https://hasura.test.novitus.devticon.com/v1/graphql"
+      }
+    }
+  }
+}

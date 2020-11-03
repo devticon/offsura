@@ -1,0 +1,69 @@
+import { buildSchema, graphql, printSchema, GraphQLSchema } from "graphql";
+import {
+  GraphQLObjectType,
+  GraphQLList,
+  GraphQLString,
+  GraphQLInt
+} from "graphql";
+import joinMonster from "join-monster";
+import { readFileSync } from "fs";
+
+const schema = buildSchema(readFileSync("./schema.graphql").toString());
+
+// The root provides a resolver function for each API endpoint
+const root = {
+  hello: () => {
+    return "Hello world!";
+  }
+};
+
+function toBase64(str: string) {
+  return Buffer.from(str).toString("base64");
+}
+const User = new GraphQLObjectType({
+  name: "User",
+  sqlTable: "users", // the SQL table for this object type is called "accounts"
+  uniqueKey: "id", // id is different for every row
+  fields: () => ({
+    id: {
+      type: GraphQLInt
+    },
+    email: {
+      type: GraphQLString
+    },
+    idEncoded: {
+      description: "The ID base-64 encoded",
+      type: GraphQLString,
+      resolve: user => toBase64(user.idEncoded)
+    },
+    fullName: {
+      description: "A user's first and last name",
+      type: GraphQLString
+    }
+  })
+});
+
+const QueryRoot = new GraphQLObjectType({
+  name: "Query",
+  fields: () => ({
+    users: {
+      type: new GraphQLList(User),
+      resolve: (parent, args, context, resolveInfo) => {
+        return joinMonster(resolveInfo, {}, sql => {
+          console.log(sql);
+        });
+      }
+    }
+  })
+});
+
+const a = new GraphQLSchema({
+  description: "a test schema",
+  query: QueryRoot
+});
+
+console.log(printSchema(a));
+// Run the GraphQL query '{ hello }' and print out the response
+graphql(a, readFileSync("./query.graphql").toString(), root).then(response => {
+  console.log(response);
+});
