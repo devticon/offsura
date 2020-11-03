@@ -1,10 +1,15 @@
+import { getConnection, initConnection } from "./db";
 import { replicate } from "./replications/core/replicate";
-import { initConnection } from "./db";
-import {getSchema} from "./schema/getSchema";
+import { offsuraConfig } from "./offsura";
 
 async function main() {
+  console.time("db init");
   await initConnection();
-  const schema = await getSchema('products');
-  await replicate(schema);
+  console.timeEnd("db init");
+
+  for (const table of offsuraConfig.tables) {
+    const count = await getConnection()(table).count();
+    console.log(`${table} count`, count);
+  }
 }
 main();

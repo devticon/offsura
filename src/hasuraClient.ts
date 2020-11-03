@@ -25,19 +25,32 @@ export const hasuraClient = {
             new RegExp("DEFAULT now\\(\\)", "g"),
             "DEFAULT CURRENT_TIMESTAMP"
           )
-          .replace(new RegExp("DEFAULT gen_random_uuid\\(\\)", "g"), "");
+          .replace(new RegExp("DEFAULT gen_random_uuid\\(\\)", "g"), "")
+          .replace(new RegExp("ALTER TABLE ONLY", "g"), " ALTER TABLE");
       });
   },
 
   metadata(tables: string[]) {
     return fetch(URL + "/v1/query", {
       method: "POST",
-      body: JSON.stringify({type: "export_metadata", args: {} })
+      body: JSON.stringify({ type: "export_metadata", args: {} })
     })
-        .then(res => res.json())
-        .then(meta => {
-          meta.tables = meta.tables.filter(t => tables.includes(t.table.name));
-          return meta;
-        })
+      .then(res => res.json())
+      .then(meta => {
+        meta.tables = meta.tables.filter(t => tables.includes(t.table.name));
+        return meta;
+      });
+  },
+
+  runSql(sql: string) {
+    return fetch(URL + "/v1/query", {
+      method: "POST",
+      body: JSON.stringify({ type: "run_sql", args: { sql } })
+    })
+      .then(res => res.json())
+      .then(({ result }) => {
+        result.shift();
+        return result;
+      });
   }
 };

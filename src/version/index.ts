@@ -1,23 +1,34 @@
-import {promises as fs} from "fs";
-import {offsuraConfig} from "../offsura";
+import { promises as fs } from "fs";
+import { offsuraConfig } from "../offsura";
+import { TableMetadata } from "./interfaces";
 
-export async function getVersionName() {
-    const [filename] = await fs.readdir(offsuraConfig.versionFilePath);
-    return filename.replace(".json", "");
+let metadata: any;
+
+export function getVersionName() {
+  return fs
+    .readFile(`${offsuraConfig.versionFilePath}/version`)
+    .then(buf => buf.toString());
 }
 
-export async function getVersionDump() {
-    const versionName = await getVersionName();
-    const content = (
-        await fs.readFile(`${offsuraConfig.versionFilePath}/${versionName}.json`)
-    ).toString();
-    return JSON.parse(content).dump
+export function getVersionMetadata(): Promise<Record<string, TableMetadata>> {
+  if (metadata) {
+    return metadata;
+  }
+  return fs
+    .readFile(`${offsuraConfig.versionFilePath}/metadata.json`)
+    .then(buf => buf.toString())
+    .then(str => JSON.parse(str))
+    .then(json => {
+      metadata = json;
+      return json;
+    });
 }
 
-export async function getVersionMetadata() {
-    const versionName = await getVersionName();
-    const content = (
-        await fs.readFile(`${offsuraConfig.versionFilePath}/${versionName}.json`)
-    ).toString();
-    return JSON.parse(content).metadata
+export async function getTableMetadata(table: string) {
+  const meta = await getVersionMetadata();
+  const tableMeta = meta[table];
+  if (!tableMeta) {
+    throw new Error(`Table metadata ${table} not found`);
+  }
+  return tableMeta;
 }

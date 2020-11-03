@@ -1,8 +1,9 @@
 import * as Knex from "knex";
 import knexfile from "./knexfile";
 import { offsuraConfig } from "./offsura";
-import {promises as fs} from "fs";
-import {getVersionDump, getVersionName} from "./version";
+import { promises as fs } from "fs";
+import { getTableMetadata, getVersionName } from "./version";
+import { replicate } from "./replications/core/replicate";
 
 let knex: Knex;
 
@@ -36,18 +37,40 @@ export async function initConnection() {
 
 async function setup(knex: Knex) {
   await knex.transaction(async trx => {
-    const newVersionName = await getVersionName();
-    const newVersionDump = await getVersionDump();
-    console.log("installing new version", { version: newVersionName });
+    const version = await getVersionName();
+
+    console.log("installing new version", { version });
     await trx.schema.createTable(offsuraConfig.versionTable, tableBuilder => {
       tableBuilder.string("version").primary();
       tableBuilder.timestamp("upgraded_at");
     });
-    await trx.raw(newVersionDump);
+    await trx.schema.createTable(offsuraConfig.cursorsTable, tableBuilder => {
+      tableBuilder.string("table").primary();
+      tableBuilder.string("cursor");
+    });
+
+    for (const table of offsuraConfig.tables) {
+      const tableMetadata = await getTableMetadata(table);
+      await trx.schema.createTable(tableMetadata.table, tableBuilder => {
+        for (const column of tableMetadata.columns) {
+          tableBuilder.specificType(column.name, column.type);
+        }
+        tableBuilder.primary(tableMetadata.primaryKeys);
+      });
+    }
     await trx(offsuraConfig.versionTable).insert({
-      version: newVersionName,
+      version: version,
       upgraded_at: new Date().toISOString()
     });
   });
   console.log("version installed");
+
+  if (offsuraConfig.waitForFirstReplication) {
+    console.log("start replication");
+    const replications: Promise<void>[] = [];
+    for (const table of offsuraConfig.tables) {
+      replications.push(replicate(table));
+    }
+    await Promise.all(replications);
+  }
 }

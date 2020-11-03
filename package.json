@@ -19,6 +19,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "db": "yarn knex --knexfile src/knexfile.ts",
-    "patch": "ts-node src/cli/patch.ts"
+    "patch": "ts-node src/cli/patch.ts",
+    "pg2sqlite": "./bin/pg2sqlite"
   }
 }
