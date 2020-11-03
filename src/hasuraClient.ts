@@ -27,5 +27,17 @@ export const hasuraClient = {
           )
           .replace(new RegExp("DEFAULT gen_random_uuid\\(\\)", "g"), "");
       });
+  },
+
+  metadata(tables: string[]) {
+    return fetch(URL + "/v1/query", {
+      method: "POST",
+      body: JSON.stringify({type: "export_metadata", args: {} })
+    })
+        .then(res => res.json())
+        .then(meta => {
+          meta.tables = meta.tables.filter(t => tables.includes(t.table.name));
+          return meta;
+        })
   }
 };

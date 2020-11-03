@@ -1,5 +1,5 @@
 node_modules
-var/dump
+var
 /sqlite
 /schema.graphql
 .idea

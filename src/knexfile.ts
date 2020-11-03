@@ -10,7 +10,7 @@ export default {
       extension: "ts"
     },
     connection: {
-      filename: "/home/krs/Projects/graphql-offline/sqlite"
+      filename: "sqlite"
     }
   }
 };

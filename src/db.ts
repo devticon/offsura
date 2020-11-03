@@ -1,10 +1,17 @@
 import * as Knex from "knex";
 import knexfile from "./knexfile";
 import { offsuraConfig } from "./offsura";
-import * as fs from "fs/promises";
+import {promises as fs} from "fs";
+import {getVersionDump, getVersionName} from "./version";
 
-export async function init() {
-  const knex = Knex(knexfile.development);
+let knex: Knex;
+
+export function getConnection() {
+  return knex;
+}
+
+export async function initConnection() {
+  knex = Knex(knexfile.development);
   try {
     const { version } = await knex(offsuraConfig.versionTable).first();
     const fileVersion = await getVersionName();
@@ -18,7 +25,7 @@ export async function init() {
       const upgradeKnex = Knex(knexfile.development);
       await setup(upgradeKnex);
       await upgradeKnex.destroy();
-      return init();
+      return initConnection();
     }
     console.log("db ready", { version });
   } catch (e) {
@@ -30,7 +37,7 @@ export async function init() {
 async function setup(knex: Knex) {
   await knex.transaction(async trx => {
     const newVersionName = await getVersionName();
-    const newVersionDump = await getVersionDump(newVersionName);
+    const newVersionDump = await getVersionDump();
     console.log("installing new version", { version: newVersionName });
     await trx.schema.createTable(offsuraConfig.versionTable, tableBuilder => {
       tableBuilder.string("version").primary();
@@ -43,15 +50,4 @@ async function setup(knex: Knex) {
     });
   });
   console.log("version installed");
-}
-
-async function getVersionName() {
-  const [filename] = await fs.readdir(offsuraConfig.dumpDir);
-  return filename.replace(".sql", "");
-}
-
-async function getVersionDump(versionName) {
-  return (
-    await fs.readFile(`${offsuraConfig.dumpDir}/${versionName}.sql`)
-  ).toString();
 }

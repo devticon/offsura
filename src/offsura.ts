@@ -1,13 +1,13 @@
 import * as path from "path";
 interface OffsuraConfig {
-  dumpDir: string;
+  versionFilePath: string;
   versionTable: string;
   postgresSchemaName: string;
   tables: string[];
 }
 
 export const offsuraConfig: OffsuraConfig = {
-  dumpDir: path.resolve("var/dump"),
+  versionFilePath: path.resolve("var/version"),
   postgresSchemaName: "public",
   versionTable: "offsura_version",
   tables: ["products"]

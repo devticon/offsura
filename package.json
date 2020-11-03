@@ -19,6 +19,6 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "db": "yarn knex --knexfile src/knexfile.ts",
-    "dump": "ts-node src/cli/dump.ts"
+    "patch": "ts-node src/cli/patch.ts"
   }
 }
