@@ -1,5 +1,5 @@
-import { getConnection } from "./db";
-import { offsuraConfig } from "./offsura";
+import { getConnection } from "../db";
+import { offsuraConfig } from "../offsura";
 
 export async function saveCursor(table: string, cursor: string) {
   console.log(table, cursor);

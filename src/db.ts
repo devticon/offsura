@@ -3,7 +3,7 @@ import knexfile from "./knexfile";
 import { offsuraConfig } from "./offsura";
 import { promises as fs } from "fs";
 import { getTableMetadata, getVersionName } from "./version";
-import { replicate } from "./replications/core/replicate";
+import { replicate } from "./replications/replicate";
 
 let knex: Knex;
 
@@ -53,7 +53,10 @@ async function setup(knex: Knex) {
       const tableMetadata = await getTableMetadata(table);
       await trx.schema.createTable(tableMetadata.table, tableBuilder => {
         for (const column of tableMetadata.columns) {
-          tableBuilder.specificType(column.name, column.type);
+          const col = tableBuilder.specificType(column.name, column.type);
+          if (column.isNullable) {
+            col.nullable();
+          }
         }
         tableBuilder.primary(tableMetadata.primaryKeys);
       });

@@ -1,4 +1,4 @@
-import { hasuraClient } from "../hasuraClient";
+import { hasuraClient } from "../husura/hasuraClient";
 import { offsuraConfig } from "../offsura";
 import * as fs from "fs/promises";
 
@@ -15,11 +15,27 @@ import * as fs from "fs/promises";
 
   const metadata = {};
   for (const table of offsuraConfig.tables) {
-    const [columns, pks] = await Promise.all([
+    const [columns, fks, pks] = await Promise.all([
       await hasuraClient.runSql(`
-        SELECT column_name,  data_type 
+        SELECT column_name,  data_type, is_nullable
         FROM  information_schema.columns
         WHERE  table_name = '${table}';
+      `),
+      await hasuraClient.runSql(`
+       SELECT
+            tc.constraint_name, 
+            kcu.column_name, 
+            ccu.table_name AS foreign_table_name,
+            ccu.column_name AS foreign_column_name 
+        FROM 
+            information_schema.table_constraints AS tc 
+            JOIN information_schema.key_column_usage AS kcu
+              ON tc.constraint_name = kcu.constraint_name
+              AND tc.table_schema = kcu.table_schema
+            JOIN information_schema.constraint_column_usage AS ccu
+              ON ccu.constraint_name = tc.constraint_name
+              AND ccu.table_schema = tc.table_schema
+        WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='${table}';
       `),
       await hasuraClient.runSql(`
         SELECT c.column_name
@@ -33,7 +49,19 @@ import * as fs from "fs/promises";
     metadata[table] = {
       table,
       primaryKeys: pks.map(([col]) => col),
-      columns: columns.map(([name, type]) => ({ name, type })),
+      foreignKeys: fks.map(
+        ([name, column, referenceTable, referenceColumn]) => ({
+          name,
+          column,
+          referenceTable,
+          referenceColumn
+        })
+      ),
+      columns: columns.map(([name, type, is_nullable]) => ({
+        name,
+        type,
+        isNullable: is_nullable === "YES"
+      })),
       hasuraMetadata: hasuraMetadata.tables.find(t => t.table.name === table)
     };
   }

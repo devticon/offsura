@@ -6,10 +6,12 @@ interface OffsuraConfig {
   postgresSchemaName: string;
   tables: string[];
   waitForFirstReplication: boolean;
+  emitSchemaFile: boolean;
 }
 
 export const offsuraConfig: OffsuraConfig = {
   waitForFirstReplication: true,
+  emitSchemaFile: true,
   versionFilePath: path.resolve("var/version"),
   postgresSchemaName: "public",
   versionTable: "offsura_version",

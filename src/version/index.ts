@@ -10,22 +10,16 @@ export function getVersionName() {
     .then(buf => buf.toString());
 }
 
-export function getVersionMetadata(): Promise<Record<string, TableMetadata>> {
+export function getVersionMetadata(): Record<string, TableMetadata> {
   if (metadata) {
     return metadata;
   }
-  return fs
-    .readFile(`${offsuraConfig.versionFilePath}/metadata.json`)
-    .then(buf => buf.toString())
-    .then(str => JSON.parse(str))
-    .then(json => {
-      metadata = json;
-      return json;
-    });
+  metadata = require(`${offsuraConfig.versionFilePath}/metadata.json`);
+  return metadata;
 }
 
-export async function getTableMetadata(table: string) {
-  const meta = await getVersionMetadata();
+export function getTableMetadata(table: string) {
+  const meta = getVersionMetadata();
   const tableMeta = meta[table];
   if (!tableMeta) {
     throw new Error(`Table metadata ${table} not found`);

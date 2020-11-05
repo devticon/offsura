@@ -1,8 +1,8 @@
 import fetch from "node-fetch";
-import { getConnection } from "../../db";
-import { getCursor, saveCursor } from "../../cursor";
-import { TableMetadata } from "../../version/interfaces";
-import { getTableMetadata } from "../../version";
+import { getConnection } from "../db";
+import { getCursor, saveCursor } from "./cursor";
+import { TableMetadata } from "../version/interfaces";
+import { getTableMetadata } from "../version";
 
 export async function query(
   tableMetadata: TableMetadata,

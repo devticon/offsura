@@ -4,15 +4,21 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@types/bookshelf": "^1.1.1",
     "@types/node": "^14.14.6",
     "@types/node-fetch": "^2.5.7",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
   },
   "dependencies": {
-    "graphql": "0.13.2",
-    "join-monster": "^2.1.2",
+    "bookshelf": "^1.2.0",
+    "dataloader": "^2.0.0",
+    "graphql": "^15.4.0",
+    "graphql-compose": "^7.22.1",
+    "join-monster": "3.0.0-alpha.1",
     "knex": "^0.21.12",
+    "lodash.groupby": "^4.6.0",
+    "lodash.mapvalues": "^4.6.0",
     "node-fetch": "^2.6.1",
     "sqlite3": "^5.0.0"
   },
