@@ -1,6 +1,5 @@
 import * as Knex from "knex";
-import knexfile from "./knexfile";
-import { offsuraConfig } from "./offsura";
+import { offsuraConfig } from "./config";
 import { promises as fs } from "fs";
 import { getTableMetadata, getVersionName } from "./version";
 import { replicate } from "./replications/replicate";
@@ -12,7 +11,7 @@ export function getConnection() {
 }
 
 export async function initConnection() {
-  knex = Knex(knexfile.development);
+  knex = Knex(offsuraConfig.knexConfig);
   try {
     const { version } = await knex(offsuraConfig.versionTable).first();
     const fileVersion = await getVersionName();
@@ -22,8 +21,9 @@ export async function initConnection() {
         new: fileVersion
       });
       await knex.destroy();
-      await fs.unlink(knexfile.development.connection.filename); // TODO
-      const upgradeKnex = Knex(knexfile.development);
+      // @ts-ignore
+      await fs.unlink(offsuraConfig.knexConfig.connection.filename); // TODO
+      const upgradeKnex = Knex(offsuraConfig.knexConfig);
       await setup(upgradeKnex);
       await upgradeKnex.destroy();
       return initConnection();
@@ -49,7 +49,7 @@ async function setup(knex: Knex) {
       tableBuilder.string("cursor");
     });
 
-    for (const table of offsuraConfig.tables) {
+    for (const table of offsuraConfig.replication.tables) {
       const tableMetadata = await getTableMetadata(table);
       await trx.schema.createTable(tableMetadata.table, tableBuilder => {
         for (const column of tableMetadata.columns) {
@@ -71,7 +71,7 @@ async function setup(knex: Knex) {
   if (offsuraConfig.waitForFirstReplication) {
     console.log("start replication");
     const replications: Promise<void>[] = [];
-    for (const table of offsuraConfig.tables) {
+    for (const table of offsuraConfig.replication.tables) {
       replications.push(replicate(table));
     }
     await Promise.all(replications);

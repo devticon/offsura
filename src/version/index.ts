@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import { offsuraConfig } from "../offsura";
+import { offsuraConfig } from "../config";
 import { TableMetadata } from "./interfaces";
 
 let metadata: any;

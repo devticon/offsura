@@ -1,7 +1,7 @@
 {
   "name": "graphql-offline",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.ts",
   "license": "MIT",
   "devDependencies": {
     "@types/bookshelf": "^1.1.1",
@@ -21,9 +21,9 @@
     "sqlite3": "^5.0.0"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "ts-node src/test/index.ts",
     "db": "yarn knex --knexfile src/knexfile.ts",
-    "patch": "ts-node src/cli/patch.ts",
-    "pg2sqlite": "./bin/pg2sqlite"
+    "patch": "ts-node src/cli/patch.ts $(pwd)/offsura.js",
+    "schema": "ts-node src/cli/schema.ts $(pwd)/offsura.js"
   }
 }

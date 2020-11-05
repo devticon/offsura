@@ -1,9 +1,15 @@
 import { hasuraClient } from "../husura/hasuraClient";
-import { offsuraConfig } from "../offsura";
+import { offsuraConfig } from "../config";
 import * as fs from "fs/promises";
+import {initOffsura} from "../index";
+import {getConnection} from "../db";
+
+const configPath = process.argv[2];
 
 (async () => {
-  const { tables } = offsuraConfig;
+  await initOffsura(configPath);
+  await getConnection().destroy();
+  const { tables } = offsuraConfig.replication;
   const hasuraMetadata = await hasuraClient.metadata(tables);
 
   await fs.rmdir(offsuraConfig.versionFilePath, { recursive: true });
@@ -14,7 +20,7 @@ import * as fs from "fs/promises";
   await fs.writeFile(`${offsuraConfig.versionFilePath}/version`, version);
 
   const metadata = {};
-  for (const table of offsuraConfig.tables) {
+  for (const table of tables) {
     const [columns, fks, pks] = await Promise.all([
       await hasuraClient.runSql(`
         SELECT column_name,  data_type, is_nullable

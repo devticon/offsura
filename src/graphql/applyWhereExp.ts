@@ -23,11 +23,9 @@ export function applyWhereExp(queryBuilder: QueryBuilder, column: string | ExpTy
   switch (column) {
     case ExpType.and:
     case ExpType.or:
-      // console.log(column, exp);
       queryBuilder.where(qb => {
       for (const _exp of exp as GraphqlWhereExp[]) {
           for (const _column of Object.keys(_exp)) {
-            console.log(_column, _exp[_column], column);
             applyWhereExp(qb, _column, _exp[_column], column as ExpType)
           }
         }
