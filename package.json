@@ -14,6 +14,8 @@
     "dataloader": "^2.0.0",
     "graphql": "^15.4.0",
     "graphql-compose": "^7.22.1",
+    "graphql-compose-connection": "^8.0.1",
+    "graphql-compose-relay": "^5.0.3",
     "knex": "^0.21.12",
     "node-fetch": "^2.6.1",
     "sqlite3": "^5.0.0"

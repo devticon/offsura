@@ -661,6 +661,16 @@ graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
+graphql-compose-connection@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-8.0.1.tgz#6416ead781108a6628c542908f43cf89d3200222"
+  integrity sha512-VBEdtzEp862TlV/uf7GDVYI0wwfTQAQlDXIZVl9IlYO5BcDD94kaPcrTuzQ/j991G09vx2ebqLu2zRI3uLZ7kg==
+
+graphql-compose-relay@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/graphql-compose-relay/-/graphql-compose-relay-5.0.3.tgz#5db94d47289f802c89dbdfdf5c95c8e5c2b14497"
+  integrity sha512-g/4TOelWAPlw3Ib2krLmmHBdqqaEHBp71/oFk/wDllK9MS5ukXVn//ffqggIVoohx453gd+UIUYCVOKukvErDA==
+
 graphql-compose@^7.22.1:
   version "7.22.1"
   resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-7.22.1.tgz#3d02ee59d33f4b6f6a55d91db2a2ffc1a75e7381"

@@ -1,0 +1,28 @@
+query {
+    products_connection {
+        edges {
+            cursor
+            node {
+                id
+                name
+                basePrice
+                categories_connection  {
+                    edges {
+                        node {
+                            id
+                            categoryId
+                            category {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+            endCursor
+        }
+    }
+}

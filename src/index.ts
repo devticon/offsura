@@ -1,7 +1,9 @@
 import { getConnection, initConnection } from "./db";
 import { getVersionMetadata } from "./version";
 import { buildSchema } from "./graphql/buildSchema";
-import { graphql } from "graphql";
+import {graphql, printSchema} from "graphql";
+import {offsuraConfig} from "./offsura";
+import {readFileSync, writeFileSync} from "fs";
 
 class QueryBuilder {
   private nested: { name: string; qb: QueryBuilder }[] = [];
@@ -68,21 +70,11 @@ async function main() {
     i++;
   });
   const schema = buildSchema(metadata, getConnection());
-  const source = `
-    query {
-      products {
-        id
-        name
-        categories {
-          categoryId
-          category {
-            name
-            id
-          }
-        }
-      }
-    }
-  `;
+
+  if(offsuraConfig.emitSchemaFile) {
+    writeFileSync('schema.graphql', printSchema(schema))
+  }
+  const source = readFileSync('./test/product_connection.graphql').toString();
   console.time("result");
   const result = await graphql({ schema, source });
   console.log(JSON.stringify(result, null, 2));
