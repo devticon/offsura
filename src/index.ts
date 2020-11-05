@@ -77,7 +77,7 @@ async function main() {
   const source = readFileSync('./test/product_connection.graphql').toString();
   console.time("result");
   const result = await graphql({ schema, source });
-  console.log(JSON.stringify(result, null, 2));
+  // console.log(JSON.stringify(result, null, 2));
   console.log("query count", i);
   console.timeEnd("result");
 }

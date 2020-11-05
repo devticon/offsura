@@ -7,10 +7,12 @@ import {objectToBase64} from "../utils/objToBase64";
 import Knex = require("knex");
 import {getTableMetadata} from "../version";
 import {useDataloader} from "./dataloaders";
+import {applyWhereExp, GraphqlWhereExp} from "./applyWhereExp";
 
 interface ConnectionArgs {
   limit: number
   sort: { column: string, order?: string }[],
+  where?: Record<string, GraphqlWhereExp>
 }
 interface RawQuery {
   where: [string, string, string][];
@@ -20,6 +22,11 @@ function buildConnectionQueryBuilder(tableMetadata: TableMetadata, args: Connect
     .limit(args.limit)
     .orderBy(args.sort);
 
+  if (args.where) {
+    for (const column of Object.keys(args.where)) {
+      applyWhereExp(qb, column, args.where[column]);
+    }
+  }
   if (rawQuery && rawQuery.where) {
     for (const [column, operator, value] of rawQuery.where) {
       qb.where(column, operator, value);
@@ -54,11 +61,16 @@ export function buildType(tableMetadata: TableMetadata, connection: Knex) {
     name: "findById",
   })
 
+  const whereInputComposer = schemaComposer.createInputTC({
+    name: `${tableMetadata.table}_where`,
+    fields: {
+      id: "String"
+    }
+  })
   objectTypeComposer.addResolver({
     name: "findMany",
     resolve({args, rawQuery, info, source}: any) {
       if (info.parentType !== "Query" && source) {
-        const childrenTableMetadata = getTableMetadata(info.parentType);
         const relationMeta = getTableMetadata(info.parentType)
           .hasuraMetadata
           .array_relationships.find(r => r.using.foreign_key_constraint_on.table.name === tableMetadata.table)
@@ -85,10 +97,10 @@ export function buildType(tableMetadata: TableMetadata, connection: Knex) {
               return grouped;
             });
         });
-        return dataloader.load(source.id); // todo PK!
+        return dataloader.load(source.id)// todo PK!
       }
       return buildConnectionQueryBuilder(tableMetadata, args, rawQuery, connection)
-        .then(data => data.map(item => convertObjectToGql(tableMetadata, item)));
+        .then(data => data.map(item => convertObjectToGql(tableMetadata, item)))
     }
   })
 

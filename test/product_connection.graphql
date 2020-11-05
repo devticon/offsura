@@ -1,5 +1,11 @@
 query {
-    products_connection {
+    products_connection (first: 20,
+        where: {
+            _or: [
+                {name: {_eq: "test"}},
+                {id: {_eq: "dupa"}}
+            ]
+        }) {
         edges {
             cursor
             node {
