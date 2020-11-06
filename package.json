@@ -1,8 +1,11 @@
 {
-  "name": "offsura",
+  "name": "@devticon/offsura",
   "version": "0.1.0",
   "main": "dist/index.js",
   "type": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "license": "MIT",
   "bin": {
     "patch": "./dist/cli/patch.js"
@@ -25,11 +28,15 @@
     "build": "tsc",
     "start": "ts-node example/node-sqlite3/src/index.ts",
     "db": "yarn knex --knexfile src/knexfile.ts",
-
     "patch": "ts-node src/cli/patch.ts  ",
-    "schema": "ts-node src/cli/schema.ts $(pwd)/offsura.js"
+    "schema": "ts-node src/cli/schema.ts $(pwd)/offsura.js",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "sqlite3": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devticon/offsura.git"
   }
 }

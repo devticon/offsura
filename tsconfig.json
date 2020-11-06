@@ -6,8 +6,6 @@
     "outDir": "dist",
     "declaration": true
   },
-  "exclude": [
-    "node_modules",
-    "example"
-  ]
+  "exclude": ["node_modules", "example"],
+  "include": ["src"]
 }
