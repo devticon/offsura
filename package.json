@@ -1,11 +1,10 @@
 {
-  "name": "graphql-offline",
-  "version": "1.0.0",
-  "main": "src/index.ts",
+  "name": "offsura",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "type": "dist/index.d.ts",
   "license": "MIT",
   "devDependencies": {
-    "@types/bookshelf": "^1.1.1",
-    "@types/node": "^14.14.6",
     "@types/node-fetch": "^2.5.7",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
@@ -21,6 +20,7 @@
     "sqlite3": "^5.0.0"
   },
   "scripts": {
+    "build": "tsc",
     "start": "ts-node src/test/index.ts",
     "db": "yarn knex --knexfile src/knexfile.ts",
     "patch": "ts-node src/cli/patch.ts $(pwd)/offsura.js",

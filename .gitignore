@@ -3,3 +3,4 @@ var
 /sqlite
 /schema.graphql
 .idea
+/dist/
