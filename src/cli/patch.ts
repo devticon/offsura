@@ -1,14 +1,13 @@
+#!/usr/bin/env node
+
 import { hasuraClient } from "../husura/hasuraClient";
-import { offsuraConfig } from "../config";
 import * as fs from "fs/promises";
-import {initOffsura} from "../index";
-import {getConnection} from "../db";
+import {offsuraConfig, setGlobalConfig} from "../config";
 
 const configPath = process.argv[2];
 
 (async () => {
-  await initOffsura(configPath);
-  await getConnection().destroy();
+  setGlobalConfig(require(configPath));
   const { tables } = offsuraConfig.replication;
   const hasuraMetadata = await hasuraClient.metadata(tables);
 

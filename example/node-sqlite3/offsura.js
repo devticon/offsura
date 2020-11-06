@@ -1,4 +1,5 @@
 module.exports = {
+  versionFilePath: __dirname + "/.offsura",
   hasura: {
     url: "https://hasura.test.novitus.devticon.com"
   },
@@ -7,9 +8,9 @@ module.exports = {
   },
   knexConfig: {
     client: "sqlite3",
-      useNullAsDefault: false,
-      connection: {
+    useNullAsDefault: false,
+    connection: {
       filename: "sqlite"
     }
   }
-}
+};
