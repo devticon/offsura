@@ -63,8 +63,8 @@ export class EntityRelationGenerator {
   toString() {
     const isNullable = this.params.nullable ? "?" : "";
     const joinColumn =
-      this.params.type === "OneToMany" && this.params.joinColumn
-        ? `\n\t@JoinColumn(${this.joinColumnOptions()})`
+      this.params.type === "ManyToOne" && this.params.joinColumn
+        ? `\n\t@Typeorm.JoinColumn(${this.joinColumnOptions()})`
         : "";
     return `\t@Typeorm.${
       this.params.type
