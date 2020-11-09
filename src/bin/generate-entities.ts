@@ -1,19 +1,17 @@
-#!/usr/bin/env node
-
+import { getOffsuraConfig } from "../index";
 import { HasuraClient } from "../husura/hasuraClient";
 import * as fs from "fs/promises";
-import { getOffsuraConfig } from "../index";
+import { TableMetadata } from "../version/interfaces";
 import { naming } from "../naming";
 import {
   EntityGenerateColumnParams,
   EntityGenerateParams,
   EntityGenerateRelationParams,
 } from "../typeorm-entity-generator/interfaces";
-import { TableMetadata } from "../version/interfaces";
 import { convertToGqlName } from "../husura/hasuraNames";
 import { writeEntity } from "../typeorm-entity-generator";
 
-(async () => {
+export async function generateEntities() {
   const offsuraConfig = getOffsuraConfig();
   const { tables } = offsuraConfig.replication;
   const hasuraClient = new HasuraClient(offsuraConfig.hasura.url);
@@ -79,7 +77,6 @@ import { writeEntity } from "../typeorm-entity-generator";
     };
   }
 
-  console.log(metadata);
   for (const [table, tableMetadata] of Object.entries(metadata) as [
     string,
     TableMetadata
@@ -150,7 +147,10 @@ import { writeEntity } from "../typeorm-entity-generator";
       relations,
       columns,
     };
-    writeEntity(`./entities/${entityFileName}.ts`, entityGeneratorParams);
+    writeEntity(
+      `./${offsuraConfig.replication.entitiesDir}/${entityFileName}.ts`,
+      entityGeneratorParams
+    );
   }
   console.log("version saved", { version });
-})();
+}

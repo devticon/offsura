@@ -10,7 +10,6 @@ export function getOffsuraConfig(): OffsuraConfig {
   if (!result) {
     throw new Error(`Offsura config not found`);
   }
-  console.log(result);
   return result.config;
 }
 export async function initOffsura() {
