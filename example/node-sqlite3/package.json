@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "offsura": "node ../../dist/bin/index.js"
+    "offsura": "ts-node ../../src/bin/index.ts"
   },
   "offsura": {
     "versionFilePath": ".offsura",
@@ -29,12 +29,14 @@
         "products_product_categories"
       ]
     },
-    "knexConfig": {
-      "client": "sqlite3",
-      "useNullAsDefault": false,
-      "connection": {
-        "filename": "sqlite"
-      }
+    "typeorm": {
+      "type": "sqlite",
+      "database": "sqlite",
+      "synchronize": true,
+      "entities": [
+        "entities/**.entity{.ts,.js}"
+      ],
+      "logging": true
     }
   }
 }

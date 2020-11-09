@@ -7,6 +7,6 @@ export const naming = {
   },
 
   tableToFilename(table: string) {
-    return this.tableToEntityName(table);
+    return capitalize(toCamelCase(singular(table))) + ".entity";
   },
 };

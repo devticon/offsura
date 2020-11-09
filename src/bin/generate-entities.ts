@@ -10,6 +10,7 @@ import {
 } from "../typeorm-entity-generator/interfaces";
 import { convertToGqlName } from "../husura/hasuraNames";
 import { writeEntity } from "../typeorm-entity-generator";
+import { psqlToSqlite } from "../typing";
 
 export async function generateEntities() {
   const offsuraConfig = getOffsuraConfig();
@@ -143,7 +144,9 @@ export async function generateEntities() {
 
     const entityGeneratorParams: EntityGenerateParams = {
       name: entityName,
+      table,
       importTypeormFrom: "typeorm",
+      typeMapper: psqlToSqlite,
       relations,
       columns,
     };

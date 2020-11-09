@@ -1,20 +1,29 @@
-import { getConnection } from "../db";
-import { offsuraConfig } from "../config";
+import { Connection } from "typeorm";
+import { ReplicationCursor } from "../entities/ReplicationCursor";
 
-export async function saveCursor(table: string, cursor: string) {
-  console.log(table, cursor);
-  const updatedCount = await getConnection()(offsuraConfig.cursorsTable)
-    .where("table", "=", table)
-    .update({ cursor });
-  if (!updatedCount) {
-    await getConnection()(offsuraConfig.cursorsTable).insert({ table, cursor });
+export async function saveCursor(
+  connection: Connection,
+  type: string,
+  cursor: string
+) {
+  const repository = connection.getRepository<ReplicationCursor>(
+    ReplicationCursor.name
+  );
+  let cursorEntity = await repository.findOne({
+    where: { type },
+  });
+
+  if (!cursorEntity) {
+    cursorEntity = repository.create({ type });
   }
+  cursorEntity.cursor = cursor;
+  await repository.save(cursorEntity);
 }
 
-export async function getCursor(table: string) {
+export async function getCursor(connection: Connection, type: string) {
   const { cursor } =
-    (await getConnection()(offsuraConfig.cursorsTable)
-      .where("table", "=", table)
-      .first()) || {};
+    (await connection
+      .getRepository<ReplicationCursor>(ReplicationCursor.name)
+      .findOne({ where: { type } })) || {};
   return cursor;
 }

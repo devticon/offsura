@@ -6,6 +6,7 @@ export interface EntityGenerateColumnParams {
   columnName?: string;
   primary?: boolean;
   primaryGenerated?: boolean;
+  typeMapper?: (type: string) => string;
 }
 
 export interface EntityGenerateRelationParams {
@@ -27,11 +28,13 @@ export interface EntityGenerateImportParams {
 
 export interface EntityGenerateParams {
   name: string;
+  table?: string;
   importTypeormFrom: string;
   extend?: {
     name: string;
     import?: EntityGenerateImportParams;
   };
+  typeMapper?: (type: string) => string;
   imports?: EntityGenerateImportParams[];
   columns: EntityGenerateColumnParams[];
   relations: EntityGenerateRelationParams[];

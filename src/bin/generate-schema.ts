@@ -1,12 +1,13 @@
 import { initOffsura } from "../index";
+import { getConnection } from "typeorm";
 import { getSchema } from "../schema";
 import { writeFileSync } from "fs";
 import { printSchema } from "graphql";
-import { getConnection } from "../db";
 
 export async function generateSchema() {
   await initOffsura();
-  await getConnection().destroy();
-  const schema = getSchema();
+  const connection = getConnection();
+  const schema = getSchema(connection);
+  await connection.close();
   writeFileSync("schema.graphql", printSchema(schema));
 }
