@@ -1,4 +1,4 @@
-import { TableMetadata } from "../version/interfaces";
+import { TableMetadata } from "../../version/interfaces";
 
 const cache: Map<string, any> = new Map();
 

@@ -1,4 +1,4 @@
-import { HasuraClient } from "../husura/hasuraClient";
+import { HasuraClient } from "../typeorm-hasura-replication/husura/hasuraClient";
 import * as fs from "fs/promises";
 import { TableMetadata } from "../version/interfaces";
 import { naming } from "../naming";
@@ -7,7 +7,7 @@ import {
   EntityGenerateParams,
   EntityGenerateRelationParams,
 } from "../typeorm-entity-generator/interfaces";
-import { convertToGqlName } from "../husura/hasuraNames";
+import { convertToGqlName } from "../typeorm-hasura-replication/husura/hasuraNames";
 import { writeEntities } from "../typeorm-entity-generator";
 import { psqlToSqlite } from "../typing";
 import { loadOffsuraConfig } from "./load-config";
@@ -15,7 +15,7 @@ import { loadOffsuraConfig } from "./load-config";
 export async function generateEntities() {
   const offsuraConfig = loadOffsuraConfig();
   const { tables } = offsuraConfig.replication;
-  const hasuraClient = new HasuraClient(offsuraConfig.hasura.url);
+  const hasuraClient = new HasuraClient(offsuraConfig.replication.hasura.url);
   const hasuraMetadata = await hasuraClient.metadata(tables);
 
   await fs.rmdir(offsuraConfig.versionFilePath, { recursive: true });
@@ -26,7 +26,8 @@ export async function generateEntities() {
   await fs.writeFile(`${offsuraConfig.versionFilePath}/version`, version);
 
   const metadata = {};
-  for (const table of tables) {
+  const tableNames = tables.map((t) => (typeof t === "string" ? t : t.table));
+  for (const table of tableNames) {
     const [columns, fks, pks] = await Promise.all([
       await hasuraClient.runSql(`
         SELECT column_name,  data_type, is_nullable

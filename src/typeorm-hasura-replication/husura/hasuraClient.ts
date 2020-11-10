@@ -1,10 +1,11 @@
 import fetch from "node-fetch";
-import { offsuraConfig } from "../config";
+import { offsuraConfig } from "../../config";
+import { ReplicationTableConfig } from "../interfaces";
 
 export class HasuraClient {
   constructor(private url: string) {}
 
-  metadata(tables: string[]) {
+  metadata(tables: (string | ReplicationTableConfig)[]) {
     return fetch(this.url + "/v1/query", {
       method: "POST",
       body: JSON.stringify({ type: "export_metadata", args: {} }),

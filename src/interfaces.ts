@@ -1,12 +1,11 @@
-import { HasuraConfig } from "./husura/interfaces";
-import { ReplicationConfig } from "./replications/interfaces";
+import { HasuraConfig } from "./typeorm-hasura-replication/husura/interfaces";
+import { ReplicationConfig } from "./typeorm-hasura-replication/interfaces";
 import { ConnectionOptions } from "typeorm/browser";
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 export type TypeormConfig = Writeable<ConnectionOptions>;
 
 export interface OffsuraRuntimeConfig {
-  hasura: HasuraConfig;
   replication: ReplicationConfig;
   typeorm: TypeormConfig;
   versionFilePath?: string;
