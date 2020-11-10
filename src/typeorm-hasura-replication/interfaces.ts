@@ -7,6 +7,7 @@ export interface ReplicationTableConfig {
 }
 export interface ReplicationConfig {
   hasura: HasuraConfig;
+  webSocketImpl?: any;
   tables: (string | ReplicationTableConfig)[];
   entitiesDir: string;
 }

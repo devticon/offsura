@@ -1,13 +1,24 @@
-import fetch from "node-fetch";
-import { getCursor, saveCursor } from "./cursor";
-import { EntityMetadata } from "typeorm/browser";
+import { Connection, EntityMetadata, ObjectLiteral } from "typeorm/browser";
 import { ReplicationConfig } from "./interfaces";
-import { Connection } from "typeorm/browser";
 import { naming } from "../naming";
+import { WebSocketLink } from "apollo-link-ws";
+import ApolloClient from "apollo-client";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import gql from "graphql-tag";
+import { BehaviorSubject, from, merge, Observable, of } from "rxjs";
+import { concatMap, filter, map, mapTo, switchMap, tap } from "rxjs/operators";
+import { ReplicationCursor } from "../entities/ReplicationCursor";
 
-function decodeId(id: string) {
-  return JSON.parse(Buffer.from(id, "base64").toString())[3];
+function decodeNode(node: ObjectLiteral) {
+  if (node.id) {
+    return {
+      ...node,
+      id: JSON.parse(Buffer.from(node.id, "base64").toString())[3],
+    };
+  }
+  return node;
 }
+
 function getUpdatedAtName(entityMetadata: EntityMetadata) {
   const col = entityMetadata.columns.find((col) =>
     ["updated_at", "updatedAt"].includes(col.propertyName)
@@ -18,13 +29,17 @@ function getUpdatedAtName(entityMetadata: EntityMetadata) {
   return col.propertyName;
 }
 
-function gql(table: string, columns: string[], type: "query" | "subscription") {
-  return `
-       ${type} Pull ($cursor: String, $limit: Int = 100, $orderBy: [${table}_order_by!]!) {
-          ${table}_connection(after: $cursor, first: $limit, order_by: $orderBy) {
+function generateGql(meta: EntityMetadata) {
+  const table = meta.tableName;
+  const columns = meta.columns.map((column) => column.propertyName).join("\n");
+  const updatedAtCol = getUpdatedAtName(meta);
+
+  return gql(`
+       subscription Pull ($cursor: String, $limit: Int = 200) {
+          ${table}_connection(after: $cursor, first: $limit, order_by: {${updatedAtCol}: asc}) {
             edges {
               node {
-                ${columns.join("\n")}
+                ${columns}
               }
             }
             pageInfo {
@@ -33,77 +48,23 @@ function gql(table: string, columns: string[], type: "query" | "subscription") {
             }
           }
         }
-      `;
+      `);
 }
-export async function query(
-  hasuraUrl: string,
-  entityMetadata: EntityMetadata,
-  cursor?: string
-) {
-  const table = entityMetadata.tableName;
-  const updatedAtCol = getUpdatedAtName(entityMetadata);
-  const orderBy = { [updatedAtCol]: "asc" };
-  const columns = entityMetadata.columns.map((column) => column.propertyName);
-
-  return await fetch(`${hasuraUrl}/v1beta1/relay`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      query: gql(table, columns, "query"),
-      variables: { cursor, orderBy: orderBy },
-    }),
-  })
-    .then((res) => res.json())
-    .then((a) => {
-      const { data, errors } = a;
-      if (errors) {
-        console.log(errors);
-        throw new Error("gql error");
-      }
-      const [key] = Object.keys(data);
-      return {
-        endCursor: data[key].pageInfo.endCursor,
-        hasNextPage: data[key].pageInfo.hasNextPage,
-        docs: data[key].edges.map((edge) => edge.node),
-      };
-    });
-}
-
-export async function replicateEntity(
-  hasuraUrl: string,
-  entityMetadata: EntityMetadata
-) {
-  const connection = entityMetadata.connection;
-  const repository = connection.getRepository(entityMetadata.name);
-  let hasNext = true;
-  let cursor = await getCursor(connection, entityMetadata.name);
-  while (hasNext) {
-    const { docs, endCursor, hasNextPage } = await query(
-      hasuraUrl,
-      entityMetadata,
-      cursor
-    );
-    hasNext = hasNextPage;
-    cursor = endCursor;
-    if (docs.length) {
-      await repository.save(
-        docs.map((doc) => {
-          if (doc.id) {
-            doc.id = decodeId(doc.id);
-          }
-          return repository.create(doc);
-        })
-      );
-      await saveCursor(connection, entityMetadata.name, cursor);
-      console.log("count", entityMetadata.name, await repository.count());
-    }
-  }
-}
+type Await<T> = T extends PromiseLike<infer U> ? U : T;
 
 export async function startReplication(
   config: ReplicationConfig,
   connection: Connection
 ) {
+  const link = new WebSocketLink({
+    uri: `wss://hasura.test.novitus.devticon.com/v1beta1/relay`,
+    webSocketImpl: config.webSocketImpl,
+  });
+  const client = new ApolloClient({
+    link,
+    cache: new InMemoryCache(),
+  });
+
   const entityNames = config.tables.map((t) => {
     if (typeof t === "string") {
       return naming.tableToEntityName(t);
@@ -111,10 +72,109 @@ export async function startReplication(
       return naming.tableToEntityName(t.table);
     }
   });
-  for (const entityName of entityNames) {
-    await replicateEntity(
-      config.hasura.url,
-      connection.getMetadata(entityName)
+  function getCursor(type: string) {
+    const repo = connection.getRepository(ReplicationCursor);
+    return from(
+      repo
+        .findOne(type)
+        .then((cursor) => cursor || repo.create({ type }))
+        .then(({ cursor }) => ({ cursor, meta: connection.getMetadata(type) }))
     );
   }
+  function subscribe({ cursor, meta }: any) {
+    return from(
+      client
+        .subscribe({
+          query: generateGql(meta),
+          variables: { cursor },
+        })
+        .map((res) => ({ meta, ...res }))
+    );
+  }
+  function mapResponse({
+    meta,
+    data,
+    errors,
+  }: {
+    meta: EntityMetadata;
+    data: any[];
+    errors: any[];
+  }) {
+    if (errors) {
+      console.log(errors);
+      throw new Error("gql error");
+    }
+    const [key] = Object.keys(data);
+    return {
+      meta,
+      endCursor: data[key].pageInfo.endCursor,
+      hasNextPage: data[key].pageInfo.hasNextPage,
+      nodes: data[key].edges.map((edge) => edge.node),
+    };
+  }
+  function save({
+    nodes,
+    endCursor,
+    meta,
+  }: Await<ReturnType<typeof mapResponse>>) {
+    return connection
+      .transaction(async (trx) => {
+        await trx.getRepository(meta.name).save(
+          nodes.map((node) => {
+            return connection.getRepository(meta.name).create(decodeNode(node));
+          })
+        );
+        await trx.getRepository(ReplicationCursor).save(
+          trx.getRepository(ReplicationCursor).create({
+            type: meta.name,
+            cursor: endCursor,
+          })
+        );
+      })
+      .then(() => {
+        return { meta };
+      })
+      .catch((error) => ({ error, meta }));
+  }
+  const subscriptions$: Record<
+    string,
+    { subject$: BehaviorSubject<string>; $: Observable<any> }
+  > = {};
+  for (const type of entityNames) {
+    const sub$ = new BehaviorSubject(type);
+    subscriptions$[type] = {
+      subject$: sub$,
+      $: sub$.pipe(
+        switchMap(getCursor),
+        switchMap(subscribe),
+        map(mapResponse),
+        filter(({ nodes }) => nodes.length)
+      ),
+    };
+  }
+
+  merge(...Object.values(subscriptions$).map(({ $ }) => $))
+    .pipe(
+      concatMap(save),
+      switchMap(({ error, meta }: any) =>
+        of({ error, meta }).pipe(
+          //log error message
+          tap(() => {
+            if (error) {
+              console.log("error", {
+                type: meta.name,
+                code: error.code,
+                message: error.message,
+              });
+            }
+          }),
+          // delayWhen(() => timer(1000)),
+          mapTo(meta)
+        )
+      ),
+      tap((meta) => {
+        subscriptions$[meta.name].subject$.next(meta.name);
+      })
+    )
+    .subscribe();
 }
