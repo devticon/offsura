@@ -1,6 +1,6 @@
 {
   "name": "offsura",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "main": "dist/index.js",
   "type": "dist/index.d.ts",
   "files": [
@@ -24,7 +24,6 @@
   "dependencies": {
     "camelcase": "^6.2.0",
     "commander": "^6.2.0",
-    "cosmiconfig": "^7.0.0",
     "dataloader": "^2.0.0",
     "graphql": "^15.4.0",
     "graphql-compose": "^7.22.1",
