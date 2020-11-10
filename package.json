@@ -1,6 +1,6 @@
 {
   "name": "offsura",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "main": "dist/index.js",
   "type": "dist/index.d.ts",
   "files": [
@@ -32,7 +32,8 @@
     "graphql-compose-relay": "^5.0.3",
     "module-alias": "^2.2.2",
     "node-fetch": "^2.6.1",
-    "pluralize": "^8.0.0"
+    "pluralize": "^8.0.0",
+    "ts-import": "^2.0.15-alpha.0"
   },
   "scripts": {
     "test": "jest",
