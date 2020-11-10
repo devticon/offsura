@@ -1,5 +1,5 @@
 import { ConnectionSortMapOpts } from "graphql-compose-connection/lib/connection";
-import { EntityMetadata, LessThan, MoreThan } from "typeorm";
+import { EntityMetadata, LessThan, MoreThan } from "typeorm/browser";
 
 export function buildConnectionSort(entityMetadata: EntityMetadata) {
   const sort: ConnectionSortMapOpts = {};

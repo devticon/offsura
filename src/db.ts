@@ -1,11 +1,10 @@
-import { ConnectionOptions, createConnection } from "typeorm";
+import { ConnectionOptions, createConnection } from "typeorm/browser";
 import { ReplicationCursor } from "./entities/ReplicationCursor";
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 export async function initConnection(config: Writeable<ConnectionOptions>) {
   config.entities = [...config.entities, ReplicationCursor];
-  console.log(config);
   const connection = await createConnection(config);
   return connection;
   // try {

@@ -1,4 +1,3 @@
-import { getOffsuraConfig } from "../index";
 import { HasuraClient } from "../husura/hasuraClient";
 import * as fs from "fs/promises";
 import { TableMetadata } from "../version/interfaces";
@@ -9,11 +8,12 @@ import {
   EntityGenerateRelationParams,
 } from "../typeorm-entity-generator/interfaces";
 import { convertToGqlName } from "../husura/hasuraNames";
-import { writeEntity } from "../typeorm-entity-generator";
+import { writeEntities } from "../typeorm-entity-generator";
 import { psqlToSqlite } from "../typing";
+import { loadOffsuraConfig } from "./load-config";
 
 export async function generateEntities() {
-  const offsuraConfig = getOffsuraConfig();
+  const offsuraConfig = loadOffsuraConfig();
   const { tables } = offsuraConfig.replication;
   const hasuraClient = new HasuraClient(offsuraConfig.hasura.url);
   const hasuraMetadata = await hasuraClient.metadata(tables);
@@ -78,6 +78,7 @@ export async function generateEntities() {
     };
   }
 
+  const entityGeneratorParams: EntityGenerateParams[] = [];
   for (const [table, tableMetadata] of Object.entries(metadata) as [
     string,
     TableMetadata
@@ -142,18 +143,19 @@ export async function generateEntities() {
       });
     }
 
-    const entityGeneratorParams: EntityGenerateParams = {
+    entityGeneratorParams.push({
       name: entityName,
       table,
-      importTypeormFrom: "typeorm",
+      importTypeormFrom: "typeorm/browser",
       typeMapper: psqlToSqlite,
       relations,
       columns,
-    };
-    writeEntity(
-      `./${offsuraConfig.replication.entitiesDir}/${entityFileName}.ts`,
-      entityGeneratorParams
-    );
+    });
   }
+  writeEntities(
+    offsuraConfig.replication.entitiesDir,
+    entityGeneratorParams,
+    naming
+  );
   console.log("version saved", { version });
 }

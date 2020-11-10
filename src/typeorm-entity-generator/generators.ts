@@ -3,6 +3,7 @@ import {
   EntityGenerateImportParams,
   EntityGenerateParams,
   EntityGenerateRelationParams,
+  GenerateEntitiesIndexProps,
 } from "./interfaces";
 
 export class EntityImportGenerator {
@@ -200,5 +201,27 @@ export class EntityGenerator {
     } else {
       this.imports.set(from, new EntityImportGenerator(params));
     }
+  }
+}
+
+export class EntitiesIndexGenerator {
+  private imports: EntityImportGenerator[] = [];
+  constructor(private props: GenerateEntitiesIndexProps) {
+    this.imports = this.props.exports.map((p) => new EntityImportGenerator(p));
+  }
+
+  entities() {
+    const entities: string[] = [];
+    for (const e of this.props.exports) {
+      for (const entity of e.get) {
+        entities.push(entity);
+      }
+    }
+    return `[\n\t${entities.join(",\n\t")}\n]`;
+  }
+  toString() {
+    const imports = this.imports.map((i) => i.toString()).join("\n");
+    const entities = this.entities();
+    return `${imports}\n\nexport const entities = ${entities};`;
   }
 }

@@ -1,4 +1,4 @@
-import { Connection } from "typeorm";
+import { Connection } from "typeorm/browser";
 import { ReplicationCursor } from "../entities/ReplicationCursor";
 
 export async function saveCursor(

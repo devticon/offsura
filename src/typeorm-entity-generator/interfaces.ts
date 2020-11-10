@@ -39,3 +39,12 @@ export interface EntityGenerateParams {
   columns: EntityGenerateColumnParams[];
   relations: EntityGenerateRelationParams[];
 }
+
+export interface GenerateEntitiesIndexProps {
+  exports: EntityGenerateImportParams[];
+}
+
+export interface Naming {
+  tableToEntityName(table: string): string;
+  tableToFilename(table: string): string;
+}

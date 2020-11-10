@@ -1,7 +1,7 @@
 import { schemaComposer } from "graphql-compose";
 import { prepareConnectionResolver } from "graphql-compose-connection";
 import { buildConnectionSort } from "./buildConnectionSort";
-import { EntityMetadata } from "typeorm";
+import { EntityMetadata } from "typeorm/browser";
 import { stringComparisonExp } from "./stringComparisonExp";
 
 export function buildConnectionResolver(entityMetadata: EntityMetadata) {

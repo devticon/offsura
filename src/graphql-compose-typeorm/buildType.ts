@@ -1,4 +1,9 @@
-import { EntityMetadata, In, ObjectLiteral, SelectQueryBuilder } from "typeorm";
+import {
+  EntityMetadata,
+  In,
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from "typeorm/browser";
 import { sqlToGraphql } from "../typing";
 import { schemaComposer } from "graphql-compose";
 import { objectToBase64 } from "../utils/objToBase64";
@@ -64,10 +69,12 @@ export function buildType(entityMetadata: EntityMetadata) {
       const qb = entityMetadata.connection
         .getRepository(entityMetadata.name)
         .createQueryBuilder(entityMetadata.name)
-        .limit(args.limit)
-        .where(rawQuery?.where || []);
+        .limit(args.limit);
 
-      applySelectionSet(qb, info, entityMetadata);
+      // applySelectionSet(qb, info, entityMetadata);
+      for (const where of rawQuery?.where || []) {
+        qb.andWhere(where);
+      }
       for (const { column, order } of args.sort) {
         qb.addOrderBy(column, order);
       }
@@ -102,10 +109,7 @@ export function buildType(entityMetadata: EntityMetadata) {
           source[joinColumn.referencedColumn.propertyName]
         );
       }
-      return qb.getMany().then((a) => {
-        console.log(a);
-        return a;
-      });
+      return qb.getMany();
     },
   });
   otc.addResolver({
@@ -123,7 +127,6 @@ export function buildType(entityMetadata: EntityMetadata) {
         (keys: string[]) => {
           where[joinColumn.propertyName] = In(keys);
           return repository.find(where).then((docs) => {
-            console.log(docs);
             const grouped = Array.from(Array(keys.length), () => []);
             for (const doc of docs) {
               const index = keys.indexOf(doc[joinColumn.propertyName]);

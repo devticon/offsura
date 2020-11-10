@@ -1,6 +1,6 @@
 import { GraphQLSchema } from "graphql";
 import { buildSchema } from "./graphql-compose-typeorm";
-import { Connection } from "typeorm";
+import { Connection } from "typeorm/browser";
 
 let schema: GraphQLSchema;
 

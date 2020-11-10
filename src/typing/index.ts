@@ -1,4 +1,4 @@
-import { ColumnType } from "typeorm";
+import { ColumnType } from "typeorm/browser";
 
 const psqlToSqliteMap: Map<string, string> = new Map<string, string>();
 psqlToSqliteMap.set("timestamp with time zone", "datetime");

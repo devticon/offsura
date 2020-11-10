@@ -1,28 +1,20 @@
 import { initConnection } from "./db";
 import { graphql } from "graphql";
 import { setGlobalConfig } from "./config";
-import { OffsuraConfig } from "./interfaces";
+import { OffsuraRuntimeConfig } from "./interfaces";
 import { getSchema } from "./schema";
-import { cosmiconfigSync } from "cosmiconfig";
-import { getConnection } from "typeorm";
+import { Connection } from "typeorm/browser";
 
-export function getOffsuraConfig(): OffsuraConfig {
-  const result = cosmiconfigSync("offsura").search();
-  if (!result) {
-    throw new Error(`Offsura config not found`);
-  }
-  return result.config;
-}
-export async function initOffsura() {
-  const config = getOffsuraConfig();
+let connection: Connection;
+export async function initOffsura(config: OffsuraRuntimeConfig) {
   setGlobalConfig(config);
-  const connection = await initConnection(config.typeorm);
+  connection = await initConnection(config.typeorm);
   getSchema(connection);
 
   return { connection };
 }
 
-export function offsura(source: string) {
-  const schema = getSchema(getConnection());
-  return graphql({ schema, source });
+export function offsura(source: string, variableValues = {}) {
+  const schema = getSchema(connection);
+  return graphql({ schema, source, variableValues });
 }

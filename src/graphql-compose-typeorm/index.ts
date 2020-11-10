@@ -1,4 +1,4 @@
-import { Connection } from "typeorm";
+import { Connection } from "typeorm/browser";
 import { schemaComposer } from "graphql-compose";
 import { buildConnectionResolver } from "./buildConnectionResolver";
 import { buildType } from "./buildType";

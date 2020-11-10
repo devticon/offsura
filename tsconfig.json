@@ -1,13 +1,21 @@
 {
   "compilerOptions": {
+//    "baseUrl": ".",
+//    "paths": {
+//      "@typeorm": ["node_modules/typeorm/browser"]
+//    },
     "module": "commonjs",
-    "target": "es5",
+    "target": "ES2015",
     "sourceMap": true,
     "outDir": "dist",
     "declaration": true,
     "resolveJsonModule": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "plugins": [
+      { "transform": "typescript-transform-paths", "useRootDirs": true }
+    ]
   },
+
   "exclude": ["node_modules", "example"],
   "include": ["src"]
 }

@@ -1,5 +1,5 @@
 import { SelectionNode } from "graphql/language/ast";
-import { EntityMetadata } from "typeorm";
+import { EntityMetadata } from "typeorm/browser";
 
 interface QuerySelectionSet {
   columns: string[];

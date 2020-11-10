@@ -1,6 +1,5 @@
 import {
   Brackets,
-  ILike,
   In,
   IsNull,
   LessThan,
@@ -10,7 +9,7 @@ import {
   MoreThanOrEqual,
   Not,
   SelectQueryBuilder,
-} from "typeorm";
+} from "typeorm/browser";
 import { WhereExpression } from "typeorm/query-builder/WhereExpression";
 
 export interface GraphqlWhereExp {
@@ -72,7 +71,7 @@ export function applyWhereExp<T = any>(
         where({ [column]: Like(value) });
         break;
       case "_ilike":
-        where({ [column]: ILike(value) });
+        where({ [column]: Like(value) });
         break;
       case "_qt":
         where({ [column]: MoreThan(value) });
@@ -96,7 +95,7 @@ export function applyWhereExp<T = any>(
         where(Not({ [column]: value }));
         break;
       case "_nilike":
-        where(Not({ [column]: ILike(value) }));
+        where(Not({ [column]: Like(value) }));
         break;
       case "_nin":
         where(Not({ [column]: In(value) }));

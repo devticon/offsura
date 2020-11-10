@@ -1,4 +1,4 @@
-import { EntityMetadata, In } from "typeorm";
+import { EntityMetadata, In } from "typeorm/browser";
 import { schemaComposer } from "graphql-compose";
 import { useDataloader } from "./dataloaders";
 

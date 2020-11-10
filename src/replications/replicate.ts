@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { getCursor, saveCursor } from "./cursor";
-import { EntityMetadata } from "typeorm";
+import { EntityMetadata } from "typeorm/browser";
 
 function getUpdatedAtName(entityMetadata: EntityMetadata) {
   const col = entityMetadata.columns.find((col) =>
@@ -59,7 +59,7 @@ export async function replicate(entityMetadata: EntityMetadata) {
         .createQueryBuilder()
         .insert()
         .values(docs)
-        .onConflict(`("products_category_id", "product_id") DO NOTHING`);
+        .execute();
       await saveCursor(connection, entityMetadata.name, cursor);
     }
   }
