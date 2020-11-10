@@ -1,0 +1,9 @@
+query {
+    Product_connection (first: 1){
+        edges {
+            node {
+                id
+            }
+        }
+    }
+}

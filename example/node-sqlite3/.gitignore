@@ -1,3 +1,5 @@
 node_modules
 sqlite
 /.offsura/
+/schema.graphql
+/entities

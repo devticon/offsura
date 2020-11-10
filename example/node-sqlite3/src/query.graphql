@@ -1,21 +1,15 @@
 query {
-    products_connection (first: 20,
-        where: {
-            _or: [
-                {name: {_eq: "test"}},
-                {id: {_eq: "dupa"}}
-            ]
-        }) {
+     Product_connection (first: 15,
+         sort: name_asc){
         edges {
             cursor
             node {
                 id
                 name
                 basePrice
-                categories_connection  {
+                categories_connection {
                     edges {
                         node {
-                            id
                             categoryId
                             category {
                                 name
