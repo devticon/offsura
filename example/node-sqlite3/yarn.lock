@@ -822,6 +822,11 @@ once@^1.3.0:
   dependencies:
     wrappy "1"
 
+options-defaults@^2.0.12-alpha.0:
+  version "2.0.12-alpha.0"
+  resolved "https://registry.yarnpkg.com/options-defaults/-/options-defaults-2.0.12-alpha.0.tgz#c7a82b9fd5dce49bd375c83bfa8f241661978b83"
+  integrity sha512-Qbbk1IgY1O0J1wgwSUXrqyPIqhnc66Q7zNe0zJJg49CGob8rivELYX6MdEZOUG60hpnfKzd+zp3AArH86NPGRQ==
+
 os-homedir@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-homedir/-/os-homedir-1.0.2.tgz#ffbc4988336e0e833de0c168c7ef152121aa7fb3"
@@ -1187,6 +1192,13 @@ tough-cookie@~2.5.0:
   dependencies:
     psl "^1.1.28"
     punycode "^2.1.1"
+
+ts-import@^2.0.15-alpha.0:
+  version "2.0.15-alpha.0"
+  resolved "https://registry.yarnpkg.com/ts-import/-/ts-import-2.0.15-alpha.0.tgz#e8f3b86792fc2c86a6b9d54eef7bf0205260053a"
+  integrity sha512-P7I+UKfyMes7tdHpkm+Q6WbWJTzOpses9686/3ppWyVwI3LBsKBBmcfhDxFHc0BiPyn+1Yo1Zv6qc76nRsw/ZQ==
+  dependencies:
+    options-defaults "^2.0.12-alpha.0"
 
 ts-node@^9.0.0:
   version "9.0.0"

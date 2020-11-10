@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "sqlite3": "^5.0.0",
+    "ts-import": "^2.0.15-alpha.0",
     "typeorm": "^0.2.29"
   },
   "devDependencies": {
@@ -15,7 +16,7 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "offsura": "node ../../lib/bin/index.js"
+    "offsura": "node ../../dist/bin/index.js"
   },
   "offsura": {
     "versionFilePath": ".offsura",

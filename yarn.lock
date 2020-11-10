@@ -2902,6 +2902,11 @@ optionator@^0.8.1:
     type-check "~0.3.2"
     word-wrap "~1.2.3"
 
+options-defaults@^2.0.12-alpha.0:
+  version "2.0.12-alpha.0"
+  resolved "https://registry.yarnpkg.com/options-defaults/-/options-defaults-2.0.12-alpha.0.tgz#c7a82b9fd5dce49bd375c83bfa8f241661978b83"
+  integrity sha512-Qbbk1IgY1O0J1wgwSUXrqyPIqhnc66Q7zNe0zJJg49CGob8rivELYX6MdEZOUG60hpnfKzd+zp3AArH86NPGRQ==
+
 p-each-series@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/p-each-series/-/p-each-series-2.1.0.tgz#961c8dd3f195ea96c747e636b262b800a6b1af48"
@@ -3716,6 +3721,13 @@ tr46@^2.0.2:
   integrity sha512-3n1qG+/5kg+jrbTzwAykB5yRYtQCTqOGKq5U5PE3b0a1/mzo6snDhjGS0zJVJunO0NrT3Dg1MLy5TjWP/UJppg==
   dependencies:
     punycode "^2.1.1"
+
+ts-import@^2.0.15-alpha.0:
+  version "2.0.15-alpha.0"
+  resolved "https://registry.yarnpkg.com/ts-import/-/ts-import-2.0.15-alpha.0.tgz#e8f3b86792fc2c86a6b9d54eef7bf0205260053a"
+  integrity sha512-P7I+UKfyMes7tdHpkm+Q6WbWJTzOpses9686/3ppWyVwI3LBsKBBmcfhDxFHc0BiPyn+1Yo1Zv6qc76nRsw/ZQ==
+  dependencies:
+    options-defaults "^2.0.12-alpha.0"
 
 ts-jest@^26.4.3:
   version "26.4.3"
