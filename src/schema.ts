@@ -1,14 +1,12 @@
-import {GraphQLSchema} from "graphql";
-import {buildSchema} from "./graphql/buildSchema";
-import {getConnection} from "./db";
-import {getVersionMetadata} from "./version";
+import { GraphQLSchema } from "graphql";
+import { buildSchema } from "./graphql-compose-typeorm";
+import { Connection } from "typeorm";
 
 let schema: GraphQLSchema;
 
-export function getSchema() {
+export function getSchema(connection: Connection) {
   if (!schema) {
-    const metadata = getVersionMetadata();
-    schema = buildSchema(metadata, getConnection());
+    schema = buildSchema(connection);
   }
   return schema;
 }
