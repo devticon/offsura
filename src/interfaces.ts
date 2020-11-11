@@ -1,14 +1,19 @@
 import { ReplicationConfig } from "./typeorm-hasura-replication/interfaces";
-import { ConnectionOptions } from "typeorm/browser";
+import { ConnectionOptions, ObjectType } from "typeorm/browser";
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 export type TypeormConfig = Writeable<ConnectionOptions>;
 
-export interface OffsuraRuntimeConfig {
+export interface OffsuraConfig {
   replication: ReplicationConfig;
   typeorm: TypeormConfig;
   versionFilePath?: string;
   versionTable?: string;
   cursorsTable?: string;
   waitForFirstReplication?: boolean;
+}
+
+export interface OffsuraRuntimeConfig {
+  webSocketImpl?: any;
+  entities: ObjectType<any>[];
 }

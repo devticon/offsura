@@ -8,12 +8,15 @@ import {
 } from "../typeorm-entity-generator/interfaces";
 import { writeEntities } from "../typeorm-entity-generator";
 import { psqlToSqlite } from "../typing";
-import { OffsuraRuntimeConfig } from "../interfaces";
+import { OffsuraConfig } from "../interfaces";
 import { HasuraClient } from "./hasuraClient";
 
-export async function generateEntities(offsuraConfig: OffsuraRuntimeConfig) {
+export async function generateEntities(offsuraConfig: OffsuraConfig) {
   const { tables } = offsuraConfig.replication;
-  const hasuraClient = new HasuraClient(offsuraConfig.replication.hasura.url);
+  const hasuraClient = new HasuraClient(
+    offsuraConfig.replication.hasura.url,
+    offsuraConfig.replication.webSocketImpl
+  );
   const hasuraMetadata = await hasuraClient.metadata(tables);
 
   await fs.rmdir(offsuraConfig.versionFilePath, { recursive: true });
@@ -85,9 +88,11 @@ export async function generateEntities(offsuraConfig: OffsuraRuntimeConfig) {
     const entityName = naming.tableToEntityName(table);
     const entityFileName = naming.tableToFilename(table);
     const relations: EntityGenerateRelationParams[] = [];
+    const customNames =
+      tableMetadata.hasuraMetadata.configuration.custom_column_names;
     const columns: EntityGenerateColumnParams[] = tableMetadata.columns.map(
       (col) => ({
-        name: col.name,
+        name: customNames[col.name] || col.name,
         columnName: col.name,
         nullable: col.isNullable,
         primaryGenerated: true,
@@ -151,6 +156,7 @@ export async function generateEntities(offsuraConfig: OffsuraRuntimeConfig) {
       columns,
     });
   }
+  hasuraClient.close();
   writeEntities(
     offsuraConfig.replication.entitiesDir,
     entityGeneratorParams,

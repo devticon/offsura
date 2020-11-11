@@ -10,13 +10,14 @@ import { map } from "rxjs/operators";
 
 export class HasuraClient {
   client: ApolloClient<any>;
+  link: WebSocketLink;
   constructor(private url: string, webSocketImpl?: any) {
-    const link = new WebSocketLink({
+    this.link = new WebSocketLink({
       uri: `${url}/v1beta1/relay`.replace("https", "wss").replace("http", "ws"),
       webSocketImpl,
     });
     this.client = new ApolloClient({
-      link,
+      link: this.link,
       cache: new InMemoryCache(),
     });
   }
@@ -89,6 +90,13 @@ export class HasuraClient {
         result.shift();
         return result;
       });
+  }
+
+  async close() {
+    this.client.stop();
+    await this.client.clearStore();
+    this.client.stop();
+    (this.link as any).subscriptionClient.close();
   }
 
   private getUpdatedAtName(entityMetadata: EntityMetadata) {

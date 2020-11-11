@@ -4,9 +4,9 @@ import { getSchema } from "../schema";
 import { writeFileSync } from "fs";
 import { printSchema } from "graphql";
 import { tsImport } from "ts-import";
-import { OffsuraRuntimeConfig } from "../interfaces";
+import { OffsuraConfig } from "../interfaces";
 
-export async function generateSchema(config: OffsuraRuntimeConfig) {
+export async function generateSchema(config: OffsuraConfig) {
   const { entities } = await tsImport.compile(
     config.replication.entitiesDir + "/index.ts"
   );
@@ -15,17 +15,18 @@ export async function generateSchema(config: OffsuraRuntimeConfig) {
       type: "sqlite",
       database: config.versionFilePath + "/sqlite",
       synchronize: true,
-      entities: entities,
     };
   }
-  config.typeorm.entities = entities;
-  await initOffsura({
-    ...config,
-    typeorm: {
-      ...config.typeorm,
-      logging: false,
+  await initOffsura(
+    {
+      ...config,
+      typeorm: {
+        ...config.typeorm,
+        logging: false,
+      },
     },
-  });
+    { entities }
+  );
   const connection = getConnection();
   const schema = getSchema(connection);
   await connection.close();

@@ -5,8 +5,11 @@ import {
 } from "relay-runtime/lib/store/RelayStoreTypes";
 import { DataID, RecordState } from "relay-runtime";
 
-export class RecordStore implements MutableRecordSource {
-  private state: RecordMap;
+export class OffsuraRecordStore implements MutableRecordSource {
+  private state: RecordMap = {};
+  constructor() {
+    recordStore = this;
+  }
   clear(): void {
     this.state = {};
   }
@@ -40,10 +43,11 @@ export class RecordStore implements MutableRecordSource {
   }
 
   size(): number {
-    return 0;
+    return Object.keys(this.state).length;
   }
 
   toJSON(): { [p: string]: Record } {
-    return {};
+    return this.state;
   }
 }
+export let recordStore: OffsuraRecordStore;

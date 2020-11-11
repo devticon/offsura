@@ -18,28 +18,5 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "offsura": "node ../../dist/bin/index.js"
-  },
-  "offsura": {
-    "versionFilePath": ".offsura",
-    "hasura": {
-      "url": "https://hasura.test.novitus.devticon.com"
-    },
-    "replication": {
-      "entitiesDir": "entities",
-      "tables": [
-        "product_categories",
-        "products",
-        "products_product_categories"
-      ]
-    },
-    "typeorm": {
-      "type": "sqlite",
-      "database": "sqlite",
-      "synchronize": true,
-      "entities": [
-        "entities/**.entity{.ts,.js}"
-      ],
-      "logging": true
-    }
   }
 }
