@@ -3,11 +3,10 @@ import { getConnection } from "typeorm/browser";
 import { getSchema } from "../schema";
 import { writeFileSync } from "fs";
 import { printSchema } from "graphql";
-import { loadOffsuraConfig } from "./load-config";
 import { tsImport } from "ts-import";
+import { OffsuraRuntimeConfig } from "../interfaces";
 
-export async function generateSchema() {
-  const config = loadOffsuraConfig();
+export async function generateSchema(config: OffsuraRuntimeConfig) {
   const { entities } = await tsImport.compile(
     config.replication.entitiesDir + "/index.ts"
   );
