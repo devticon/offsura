@@ -1,4 +1,3 @@
-import { HasuraClient } from "../typeorm-hasura-replication/husura/hasuraClient";
 import * as fs from "fs/promises";
 import { TableMetadata } from "../version/interfaces";
 import { naming } from "../naming";
@@ -7,13 +6,12 @@ import {
   EntityGenerateParams,
   EntityGenerateRelationParams,
 } from "../typeorm-entity-generator/interfaces";
-import { convertToGqlName } from "../typeorm-hasura-replication/husura/hasuraNames";
 import { writeEntities } from "../typeorm-entity-generator";
 import { psqlToSqlite } from "../typing";
-import { loadOffsuraConfig } from "./load-config";
+import { OffsuraRuntimeConfig } from "../interfaces";
+import { HasuraClient } from "./hasuraClient";
 
-export async function generateEntities() {
-  const offsuraConfig = loadOffsuraConfig();
+export async function generateEntities(offsuraConfig: OffsuraRuntimeConfig) {
   const { tables } = offsuraConfig.replication;
   const hasuraClient = new HasuraClient(offsuraConfig.replication.hasura.url);
   const hasuraMetadata = await hasuraClient.metadata(tables);
@@ -89,7 +87,7 @@ export async function generateEntities() {
     const relations: EntityGenerateRelationParams[] = [];
     const columns: EntityGenerateColumnParams[] = tableMetadata.columns.map(
       (col) => ({
-        name: convertToGqlName(tableMetadata, col.name),
+        name: col.name,
         columnName: col.name,
         nullable: col.isNullable,
         primaryGenerated: true,

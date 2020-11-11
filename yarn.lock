@@ -592,6 +592,11 @@
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.1.5.tgz#b6ab3bba29e16b821d84e09ecfaded462b816b00"
   integrity sha512-UEyp8LwZ4Dg30kVU2Q3amHHyTn1jEdhCIE59ANed76GaT1Vp76DD3ZWSAxgCrw6wJ0TqeoBpqmfUHiUDPs//HQ==
 
+"@types/relay-runtime@^10.0.10":
+  version "10.0.10"
+  resolved "https://registry.yarnpkg.com/@types/relay-runtime/-/relay-runtime-10.0.10.tgz#b7c2ed282c62d7291cfb662b0e940ca4e193be4b"
+  integrity sha512-mVB6a63uzZ0PRu19A4WiGFUFww8u7cjTE6HHoKy94pUzRfQ/l3qsfjgJlzr7fA/HCM0I4spPpaUunDbp83N9uQ==
+
 "@types/stack-utils@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.0.tgz#7036640b4e21cc2f259ae826ce843d277dad8cff"

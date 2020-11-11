@@ -1,4 +1,5 @@
-import { HasuraConfig } from "./husura/interfaces";
+import { EntityMetadata } from "typeorm/browser";
+import { BehaviorSubject, Observable } from "rxjs";
 
 export interface ReplicationTableConfig {
   table: string;
@@ -11,3 +12,21 @@ export interface ReplicationConfig {
   tables: (string | ReplicationTableConfig)[];
   entitiesDir: string;
 }
+
+export interface HasuraConfig {
+  url: string;
+}
+
+export interface SubscribeResult<T = any> {
+  nodes: T[];
+  endCursor: string;
+  hasNextPage: boolean;
+  meta: EntityMetadata;
+}
+
+export type SubscribeRecord = {
+  subject$: BehaviorSubject<string>;
+  $: Observable<any>;
+};
+
+export type SubscribeRecords = Record<string, SubscribeRecord>;

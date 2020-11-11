@@ -19,7 +19,6 @@ export async function generateSchema() {
       entities: entities,
     };
   }
-  // @ts-ignore
   config.typeorm.entities = entities;
   await initOffsura({
     ...config,
