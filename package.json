@@ -1,6 +1,6 @@
 {
   "name": "offsura",
-  "version": "0.2.30",
+  "version": "0.2.31",
   "main": "dist/index.js",
   "type": "dist/index.d.ts",
   "files": [
