@@ -73,7 +73,7 @@ export function buildConnection<
   const connectionOTC = schemaComposer.createObjectTC({
     name: `${entityMetadata.tableName}_connection`,
     fields: {
-      edges: edgeOTC.getTypePlural().getTypeNonNull(),
+      edges: edgeOTC.getTypeNonNull().getTypePlural().getTypeNonNull(),
       pageInfo: pageInfoOTC.getTypeNonNull(),
     },
   });
