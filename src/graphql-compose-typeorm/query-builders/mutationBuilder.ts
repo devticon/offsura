@@ -48,7 +48,7 @@ class MutationBuilder<T = any> extends QueryBuilder<T> {
     if (!(this.queryBuilder instanceof UpdateQueryBuilder)) {
       throw new Error("values can use only on InsertQuery");
     }
-    this.queryBuilder.set(values);
+    this.queryBuilder.set({ ...values });
     return this;
   }
 
@@ -79,10 +79,8 @@ class MutationBuilder<T = any> extends QueryBuilder<T> {
   }
 
   async getOne(): Promise<T> {
-    const {
-      identifiers: [id],
-    } = await this.queryBuilder.execute();
-    return this.getRepository().findOneOrFail(id);
+    const { identifiers } = await this.queryBuilder.execute();
+    return this.getRepository().findOneOrFail(identifiers);
   }
 
   async saveMutation() {}

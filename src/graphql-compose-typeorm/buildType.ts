@@ -7,6 +7,7 @@ import { sqlToGraphql } from "../typing";
 import { schemaComposer } from "graphql-compose";
 import { useDataloader } from "./dataloaders";
 import { ResolverResolveParams } from "graphql-compose/lib/Resolver";
+import { offsuraConfig } from "../config";
 
 const nodeInputTC = schemaComposer.createInterfaceTC({
   name: "Node",
@@ -112,27 +113,33 @@ export function buildType(entityMetadata: EntityMetadata) {
     interfaces: [nodeInputTC],
   });
 
-  if (otc.hasField("id")) {
-    otc.setField("_id", {
-      type: otc.getField("id").type,
+  if (!offsuraConfig.usePlainRelayId || !otc.hasField("id")) {
+    if (otc.hasField("id")) {
+      otc.setField("_id", {
+        type: otc.getField("id").type,
+        resolve(source) {
+          return source.id;
+        },
+      });
+    }
+    otc.setField("id", {
+      type: "String!",
       resolve(source) {
-        return source.id;
+        const primary = entityMetadata.connection
+          .getRepository(entityMetadata.tableName)
+          .getId(source);
+        const ids =
+          typeof primary === "object" ? Object.values(primary) : [primary];
+
+        const payload = [1, "public", entityMetadata.tableName, ...ids];
+        return Buffer.from(JSON.stringify(payload)).toString("base64");
       },
     });
+  } else {
+    otc.setField("id", {
+      type: "String!",
+    });
   }
-  otc.setField("id", {
-    type: "String!",
-    resolve(source) {
-      const primary = entityMetadata.connection
-        .getRepository(entityMetadata.tableName)
-        .getId(source);
-      const ids =
-        typeof primary === "object" ? Object.values(primary) : [primary];
-
-      const payload = [1, "public", entityMetadata.tableName, ...ids];
-      return Buffer.from(JSON.stringify(payload)).toString("base64");
-    },
-  });
 
   otc.addResolver({
     name: "findById",

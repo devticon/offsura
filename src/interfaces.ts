@@ -11,6 +11,7 @@ export interface OffsuraConfig {
   versionTable?: string;
   cursorsTable?: string;
   waitForFirstReplication?: boolean;
+  usePlainRelayId?: boolean;
 }
 
 export interface OffsuraRuntimeConfig {

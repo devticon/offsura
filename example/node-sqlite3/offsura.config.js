@@ -1,5 +1,6 @@
 module.exports = {
   versionFilePath: ".offsura",
+  usePlainRelayId: true,
   replication: {
     hasura: {
       url: "https://hasura.test.novitus.devticon.com",
