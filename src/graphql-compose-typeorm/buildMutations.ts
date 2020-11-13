@@ -69,7 +69,7 @@ export function buildMutations(entityMetadata: EntityMetadata) {
   const mutationResponseObjectTC = buildMutationResponseObject(entityMetadata);
   const objectTc = schemaComposer.getOTC(entityName);
   const inputTC = schemaComposer.createInputTC({
-    name: `${entityMetadata.tableName}_input`,
+    name: `${entityMetadata.tableName}_insert_input`,
     fields,
   });
   const onConflictInputTC = schemaComposer.createInputTC({
