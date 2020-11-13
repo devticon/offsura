@@ -1,19 +1,35 @@
 import { schemaComposer } from "graphql-compose";
+import { InputTypeComposer } from "graphql-compose/lib/InputTypeComposer";
 
-export const stringComparisonExp = schemaComposer.createInputTC({
-  name: "String_comparison_exp",
-  fields: {
-    _eq: "String",
-    _like: "String",
-    _ilike: "String",
-    _qt: "String",
-    _qte: "String",
-    _lt: "String",
-    _lte: "String",
-    _in: "[String!]",
-    _is_nul: "Boolean",
-    _neq: "String",
-    _nilike: "String",
-    _nin: "[String!]",
-  },
-});
+function generate(type: string) {
+  return schemaComposer.createInputTC({
+    name: `${type}_comparison_exp`,
+    fields: {
+      _eq: type,
+      _like: type,
+      _ilike: type,
+      _qt: type,
+      _qte: type,
+      _lt: type,
+      _lte: type,
+      _in: `[${type}!]`,
+      _is_nul: "Boolean",
+      _neq: type,
+      _nilike: type,
+      _nin: `[${type}!]`,
+    },
+  });
+}
+const comparisonExpMap: Record<string, InputTypeComposer> = {
+  uuid: generate("uuid"),
+  String: generate("String"),
+  Int: generate("Int"),
+  Boolean: generate("Boolean"),
+};
+
+export function getComparisonExp(type: string) {
+  if (!comparisonExpMap[type]) {
+    throw new Error(`cannot found comparisonExp ${type}`);
+  }
+  return comparisonExpMap[type];
+}

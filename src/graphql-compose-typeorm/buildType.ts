@@ -112,7 +112,14 @@ export function buildType(entityMetadata: EntityMetadata) {
     interfaces: [nodeInputTC],
   });
 
-  console.log("add type", otc.getTypeName());
+  if (otc.hasField("id")) {
+    otc.setField("_id", {
+      type: otc.getField("id").type,
+      resolve(source) {
+        return source.id;
+      },
+    });
+  }
   otc.setField("id", {
     type: "String!",
     resolve(source) {

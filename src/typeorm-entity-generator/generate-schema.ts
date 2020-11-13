@@ -3,13 +3,11 @@ import { getConnection } from "typeorm/browser";
 import { getOffsuraSchema } from "../schema";
 import { writeFileSync } from "fs";
 import { printSchema } from "graphql";
-import { tsImport } from "ts-import";
 import { OffsuraConfig } from "../interfaces";
+import { importEntities } from "./importEntities";
 
 export async function generateSchema(config: OffsuraConfig) {
-  const { entities } = await tsImport.compile(
-    config.replication.entitiesDir + "/index.ts"
-  );
+  const entities = await importEntities(config);
   if (config.typeorm.type === "react-native") {
     config.typeorm = {
       type: "sqlite",

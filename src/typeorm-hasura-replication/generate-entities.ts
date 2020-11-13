@@ -89,7 +89,7 @@ export async function generateEntities(offsuraConfig: OffsuraConfig) {
     const entityFileName = naming.tableToFilename(table);
     const relations: EntityGenerateRelationParams[] = [];
     const customNames =
-      tableMetadata.hasuraMetadata.configuration.custom_column_names;
+      tableMetadata.hasuraMetadata.configuration?.custom_column_names || {};
     const columns: EntityGenerateColumnParams[] = tableMetadata.columns.map(
       (col) => ({
         name: customNames[col.name] || col.name,

@@ -1,11 +1,12 @@
 import { schemaComposer } from "graphql-compose";
 import { EntityMetadata } from "typeorm/browser";
-import { stringComparisonExp } from "./stringComparisonExp";
 import { Thunk } from "graphql-compose/lib/utils/definitions";
 import { InputTypeComposerFieldConfigMapDefinition } from "graphql-compose/lib/InputTypeComposer";
 import { ConnectionArgs, ConnectionResult } from "./interfaces";
 import { ResolverResolveParams } from "graphql-compose/lib/Resolver";
 import { createConnectionQueryBuilder } from "./query-builders/connectionQueryBuilder";
+import { sqlToGraphql } from "../typing";
+import { getComparisonExp } from "./stringComparisonExp";
 
 const pageInfoOTC = schemaComposer.createObjectTC({
   name: "PageInfo",
@@ -47,7 +48,7 @@ function createWhereITC(entityMetadata: EntityMetadata) {
   });
   for (const column of entityMetadata.columns) {
     whereInput.setField(column.propertyName, {
-      type: stringComparisonExp,
+      type: getComparisonExp(sqlToGraphql(column.type, true)),
     });
   }
   return whereInput;

@@ -16,7 +16,7 @@ export function psqlToSqlite(type: string) {
   return psqlToSqliteMap.get(type) || type;
 }
 
-export function sqlToGql(type: string) {
+function sqlToGql(type: string) {
   const mapped = sqlToGqlMap.get(type);
   if (!mapped) {
     console.log("missing gql map type", type);

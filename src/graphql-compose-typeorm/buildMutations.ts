@@ -38,7 +38,7 @@ function buildPkInput(entityMetadata: EntityMetadata) {
 function buildSetInput(entityMetadata: EntityMetadata) {
   const fields: Thunk<InputTypeComposerFieldConfigMapDefinition> = {};
   for (const column of entityMetadata.columns) {
-    fields[column.propertyName] = sqlToGraphql(column.type, false);
+    fields[column.propertyName] = sqlToGraphql(column.type, true);
   }
   return schemaComposer.createInputTC({
     name: `${entityMetadata.tableName}_set_input`,

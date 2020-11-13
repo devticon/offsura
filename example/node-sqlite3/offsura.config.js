@@ -11,6 +11,8 @@ module.exports = {
       "products_product_categories",
       "orders",
       "orders_items",
+      "payment_methods",
+      "partners",
     ],
   },
   typeorm: {
