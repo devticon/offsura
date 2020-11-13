@@ -5,10 +5,12 @@ import { buildRelations } from "./buildRelations";
 import { buildConnection } from "./buildConnection";
 import { buildMutations } from "./buildMutations";
 import { ReplicationCursor } from "../entities/ReplicationCursor";
+import { ReplicationMutation } from "../entities/ReplicationMutation";
 
 export function buildSchema(connection: Connection) {
   const entityMetadatas = connection.entityMetadatas.filter(
-    (meta) => ![ReplicationCursor.name].includes(meta.name)
+    (meta) =>
+      ![ReplicationCursor.name, ReplicationMutation.name].includes(meta.name)
   );
   for (const entityMetadata of entityMetadatas) {
     buildType(entityMetadata);

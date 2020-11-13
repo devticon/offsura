@@ -33,7 +33,7 @@ export abstract class QueryBuilder<T> {
   protected alias: string;
 
   constructor(protected entityMetadata: EntityMetadata) {
-    this.alias = entityMetadata.name;
+    this.alias = entityMetadata.tableName;
     this.queryBuilder = this.getRepository().createQueryBuilder(this.alias);
   }
 
@@ -62,12 +62,12 @@ export abstract class QueryBuilder<T> {
 
   protected getRepository() {
     return this.entityMetadata.connection.getRepository<T>(
-      this.entityMetadata.name
+      this.entityMetadata.tableName
     );
   }
 
   protected prefix(field: string) {
-    return `${this.entityMetadata.name}.${field}`;
+    return `${this.entityMetadata.tableName}.${field}`;
   }
 
   private applyColumnWhere<T = any>(

@@ -21,7 +21,7 @@ function buildUpdateColumnsEnum(entityMetadata: EntityMetadata) {
     values[column.propertyName] = { value: column.databaseName };
   }
   return schemaComposer.createEnumTC({
-    name: `${entityMetadata.name}_update_columns`,
+    name: `${entityMetadata.tableName}_update_columns`,
     values,
   });
 }
@@ -31,7 +31,7 @@ function buildPkInput(entityMetadata: EntityMetadata) {
     fields[column.propertyName] = sqlToGraphql(column.type, true);
   }
   return schemaComposer.createInputTC({
-    name: `${entityMetadata.name}_pk_columns_input`,
+    name: `${entityMetadata.tableName}_pk_columns_input`,
     fields,
   });
 }
@@ -41,14 +41,14 @@ function buildSetInput(entityMetadata: EntityMetadata) {
     fields[column.propertyName] = sqlToGraphql(column.type, false);
   }
   return schemaComposer.createInputTC({
-    name: `${entityMetadata.name}_set_input`,
+    name: `${entityMetadata.tableName}_set_input`,
     fields,
   });
 }
 function buildMutationResponseObject(entityMetadata: EntityMetadata) {
-  const objectTc = schemaComposer.getOTC(entityMetadata.name);
+  const objectTc = schemaComposer.getOTC(entityMetadata.tableName);
   return schemaComposer.createObjectTC({
-    name: `${entityMetadata.name}_mutation_response`,
+    name: `${entityMetadata.tableName}_mutation_response`,
     fields: {
       affected_rows: "Int!",
       returning: objectTc.getTypePlural().getTypeNonNull(),
@@ -56,7 +56,7 @@ function buildMutationResponseObject(entityMetadata: EntityMetadata) {
   });
 }
 export function buildMutations(entityMetadata: EntityMetadata) {
-  const entityName = entityMetadata.name;
+  const entityName = entityMetadata.tableName;
   const fields: Thunk<InputTypeComposerFieldConfigMapDefinition> = {};
   for (const column of entityMetadata.columns) {
     fields[column.propertyName] = {
@@ -69,7 +69,7 @@ export function buildMutations(entityMetadata: EntityMetadata) {
   const mutationResponseObjectTC = buildMutationResponseObject(entityMetadata);
   const objectTc = schemaComposer.getOTC(entityName);
   const inputTC = schemaComposer.createInputTC({
-    name: `${entityMetadata.name}Input`,
+    name: `${entityMetadata.tableName}_input`,
     fields,
   });
   const onConflictInputTC = schemaComposer.createInputTC({

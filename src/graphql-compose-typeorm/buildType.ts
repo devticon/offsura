@@ -40,7 +40,7 @@ function findRelationBySource(
   );
   if (!relation) {
     throw new Error(
-      `Source relation for (${entityMetadata.name}.${source.constructor.name}) not found`
+      `Source relation for (${entityMetadata.tableName}.${source.constructor.name}) not found`
     );
   }
   return relation;
@@ -56,8 +56,8 @@ function resolveConnection(
   }: Partial<ResolverResolveParams<any, any, any>>
 ) {
   const qb = entityMetadata.connection
-    .getRepository(entityMetadata.name)
-    .createQueryBuilder(entityMetadata.name)
+    .getRepository(entityMetadata.tableName)
+    .createQueryBuilder(entityMetadata.tableName)
     .limit(args.limit);
 
   // applySelectionSet(qb, info, entityMetadata);
@@ -75,12 +75,12 @@ function resolveConnection(
     const relation = findRelationBySource(entityMetadata, source);
     const joinColumn = relation.joinColumns[0];
     const dataloader = useDataloader(
-      `${entityMetadata.name}_${relation.propertyName}`,
+      `${entityMetadata.tableName}_${relation.propertyName}`,
       (keys: string[]) => {
         const alias = `${relation.propertyName}_${joinColumn.propertyName}`;
         return qb
           .andWhere(
-            `${entityMetadata.name}.${joinColumn.propertyName} IN (:...${alias})`,
+            `${entityMetadata.tableName}.${joinColumn.propertyName} IN (:...${alias})`,
             { [alias]: keys }
           )
           .getMany()
@@ -107,19 +107,20 @@ export function buildType(entityMetadata: EntityMetadata) {
   }
 
   const otc = schemaComposer.createObjectTC({
-    name: entityMetadata.name,
+    name: entityMetadata.tableName,
     fields,
     interfaces: [nodeInputTC],
   });
 
+  console.log("add type", otc.getTypeName());
   otc.setField("id", {
     type: "String!",
     resolve(source) {
       return Buffer.from(
         JSON.stringify({
-          type: entityMetadata.name,
+          type: entityMetadata.tableName,
           id: entityMetadata.connection
-            .getRepository(entityMetadata.name)
+            .getRepository(entityMetadata.tableName)
             .getId(source),
         })
       ).toString("base64");

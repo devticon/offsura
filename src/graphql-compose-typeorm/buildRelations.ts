@@ -3,16 +3,16 @@ import { schemaComposer } from "graphql-compose";
 import { useDataloader } from "./dataloaders";
 
 export function buildRelations(entityMetadata: EntityMetadata) {
-  const otc = schemaComposer.getOTC(entityMetadata.name);
+  const otc = schemaComposer.getOTC(entityMetadata.tableName);
   for (const relation of entityMetadata.manyToOneRelations) {
-    const type = relation.inverseEntityMetadata.name;
+    const type = relation.inverseEntityMetadata.tableName;
     otc.setField(relation.propertyName, {
       type: `${type}${relation.isNullable ? "" : "!"}`,
       resolve(source) {
         const where = {};
         const joinColumn = relation.joinColumns[0];
         const dataloader = useDataloader(
-          `${entityMetadata.name}_${relation.propertyName}`,
+          `${entityMetadata.tableName}_${relation.propertyName}`,
           (keys: string[]) => {
             where[joinColumn.referencedColumn.propertyName] = In(keys);
             return entityMetadata.connection
@@ -36,7 +36,7 @@ export function buildRelations(entityMetadata: EntityMetadata) {
     });
   }
   for (const relation of entityMetadata.oneToManyRelations) {
-    const type = relation.inverseEntityMetadata.name;
+    const type = relation.inverseEntityMetadata.tableName;
     // otc.setField(relation.propertyName, {
     //   type:,
     // });

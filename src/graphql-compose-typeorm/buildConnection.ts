@@ -31,14 +31,14 @@ function createOrderByITC(entityMetadata: EntityMetadata) {
     fields[column.propertyName] = orderByETC;
   }
   return schemaComposer.createInputTC({
-    name: `${entityMetadata.name}_order_by`,
+    name: `${entityMetadata.tableName}_order_by`,
     fields,
   });
 }
 function createWhereITC(entityMetadata: EntityMetadata) {
-  const expName = `${entityMetadata.name}_bool_exp`;
+  const expName = `${entityMetadata.tableName}_bool_exp`;
   const whereInput = schemaComposer.createInputTC({
-    name: `${entityMetadata.name}_bool_exp`,
+    name: `${entityMetadata.tableName}_bool_exp`,
     fields: {
       _and: `[${expName}]`,
       _not: `[${expName}]`,
@@ -58,10 +58,10 @@ export function buildConnection<
   TContext,
   TArgs extends ConnectionArgs
 >(entityMetadata: EntityMetadata) {
-  const entityName = entityMetadata.name;
+  const entityName = entityMetadata.tableName;
   const nodeOTC = schemaComposer.getOTC(entityName);
   const edgeOTC = schemaComposer.createObjectTC({
-    name: `${entityMetadata.name}Edge`,
+    name: `${entityMetadata.tableName}_edge`,
     fields: {
       cursor: "String!",
       node: nodeOTC.getTypeNonNull(),
@@ -70,7 +70,7 @@ export function buildConnection<
   const orderByITC = createOrderByITC(entityMetadata);
   const whereITC = createWhereITC(entityMetadata);
   const connectionOTC = schemaComposer.createObjectTC({
-    name: `${entityMetadata.name}Connection`,
+    name: `${entityMetadata.tableName}_connection`,
     fields: {
       edges: edgeOTC.getTypePlural().getTypeNonNull(),
       pageInfo: pageInfoOTC.getTypeNonNull(),
@@ -78,7 +78,7 @@ export function buildConnection<
   });
 
   const connectionResolver = schemaComposer.createResolver({
-    name: `${entityMetadata.name}_connection`,
+    name: `${entityMetadata.tableName}_connection`,
     type: connectionOTC.getTypeNonNull(),
     args: {
       first: "Int",
@@ -102,7 +102,7 @@ export function buildConnection<
   });
 
   schemaComposer.Query.setField(
-    `${entityMetadata.name}_connection`,
+    `${entityMetadata.tableName}_connection`,
     connectionResolver
   );
 }

@@ -84,6 +84,8 @@ class MutationBuilder<T = any> extends QueryBuilder<T> {
     } = await this.queryBuilder.execute();
     return this.getRepository().findOneOrFail(id);
   }
+
+  async saveMutation() {}
 }
 
 export function createMutationBuilder(entityMetadata: EntityMetadata) {
