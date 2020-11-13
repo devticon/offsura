@@ -6,8 +6,10 @@ import { buildConnection } from "./buildConnection";
 import { buildMutations } from "./buildMutations";
 import { ReplicationCursor } from "../entities/ReplicationCursor";
 import { ReplicationMutation } from "../entities/ReplicationMutation";
+import { buildScalars } from "./scalars";
 
 export function buildSchema(connection: Connection) {
+  buildScalars();
   const entityMetadatas = connection.entityMetadatas.filter(
     (meta) =>
       ![ReplicationCursor.name, ReplicationMutation.name].includes(meta.name)
