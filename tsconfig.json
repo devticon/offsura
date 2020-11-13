@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-//    "baseUrl": ".",
-//    "paths": {
-//      "@typeorm": ["node_modules/typeorm/browser"]
-//    },
     "module": "commonjs",
     "target": "ES2015",
     "sourceMap": true,

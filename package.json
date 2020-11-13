@@ -31,12 +31,12 @@
     "commander": "^6.2.0",
     "cosmiconfig": "^7.0.0",
     "dataloader": "^2.0.0",
+    "graphql": "^15.4.0",
     "graphql-compose": "^7.22.1",
     "graphql-tag": "^2.11.0",
     "module-alias": "^2.2.2",
     "node-fetch": "^2.6.1",
     "pluralize": "^8.0.0",
-    "reactive-graphql": "^4.0.1",
     "rxjs": "^6.6.3",
     "subscriptions-transport-ws": "^0.9.18",
     "ts-import": "^2.0.15-alpha.0"

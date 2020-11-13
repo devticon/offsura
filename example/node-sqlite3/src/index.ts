@@ -1,11 +1,18 @@
 const moduleAlias = require("module-alias");
 moduleAlias.addAlias("typeorm/browser", "typeorm");
 
+import { graphqlHTTP } from "express-graphql";
+import playground from "graphql-playground-middleware-express";
+import {
+  initOffsura,
+  OffsuraConfig,
+  startReplication,
+  getOffsuraSchema,
+} from "../../../dist";
 import { entities } from "../entities";
+import * as express from "express";
 
-import { OffsuraConfig } from "../../../dist/interfaces";
-import { initOffsura } from "../../../dist";
-import { startReplication } from "../../../dist/typeorm-hasura-replication";
+const app = express();
 
 async function main() {
   const config: OffsuraConfig = require("../offsura.config");
@@ -15,10 +22,21 @@ async function main() {
   });
   startReplication(config.replication, connection);
 
-  // const query = readFileSync(__dirname + "/get-product.graphql").toString();
-  // console.time("result");
-  // const result = await offsura(query);
-  // console.log(JSON.stringify(result, null, 2));
-  // console.timeEnd("result");
+  app.get(
+    "/",
+    playground({
+      endpoint: "/graphql",
+    })
+  );
+  app.use(
+    "/graphql",
+    graphqlHTTP({
+      schema: getOffsuraSchema(connection),
+      graphiql: true,
+    })
+  );
+
+  app.listen(4000);
 }
+
 main();

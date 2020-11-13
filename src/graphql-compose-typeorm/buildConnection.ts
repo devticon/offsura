@@ -5,10 +5,7 @@ import { Thunk } from "graphql-compose/lib/utils/definitions";
 import { InputTypeComposerFieldConfigMapDefinition } from "graphql-compose/lib/InputTypeComposer";
 import { ConnectionArgs, ConnectionResult } from "./interfaces";
 import { ResolverResolveParams } from "graphql-compose/lib/Resolver";
-import { from, Observable } from "rxjs";
-import { repeatWhen, tap } from "rxjs/operators";
-import { replicas$ } from "../typeorm-hasura-replication";
-import { createConnectionQueryBuilder } from "./connectionQueryBuilder";
+import { createConnectionQueryBuilder } from "./query-builders/connectionQueryBuilder";
 
 const pageInfoOTC = schemaComposer.createObjectTC({
   name: "PageInfo",
@@ -56,7 +53,7 @@ function createWhereITC(entityMetadata: EntityMetadata) {
   return whereInput;
 }
 
-export function buildConnectionResolver<
+export function buildConnection<
   TSource,
   TContext,
   TArgs extends ConnectionArgs
@@ -93,17 +90,14 @@ export function buildConnectionResolver<
     },
     resolve({
       args,
-    }: ResolverResolveParams<any, any, ConnectionArgs>): Observable<
+      source,
+    }: ResolverResolveParams<any, any, ConnectionArgs>): Promise<
       ConnectionResult<any>
     > {
-      return from(
-        createConnectionQueryBuilder(entityMetadata)
-          .applyArgs(args)
-          .getConnection()
-      ).pipe(
-        tap(() => console.log("toooooooo")),
-        repeatWhen(() => replicas$)
-      );
+      return createConnectionQueryBuilder(entityMetadata)
+        .applyArgs(args)
+        .applySource(source)
+        .getConnection();
     },
   });
 
@@ -111,18 +105,4 @@ export function buildConnectionResolver<
     `${entityMetadata.name}_connection`,
     connectionResolver
   );
-  // const objectTypeComposer = schemaComposer.getOTC(entityMetadata.name);
-  // const sort = buildConnectionSort(entityMetadata);
-  //
-  // const resolver = prepareConnectionResolver(objectTypeComposer, {
-  //   findManyResolver: objectTypeComposer.getResolver("connection"),
-  //   countResolver: objectTypeComposer.getResolver("count"),
-  //   sort,
-  // });
-  //
-
-  // resolver.addArgs({
-  //   where: whereInput,
-  // });
-  // return resolver;
 }

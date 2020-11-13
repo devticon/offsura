@@ -4,7 +4,7 @@ import { Connection } from "typeorm/browser";
 
 let schema: GraphQLSchema;
 
-export function getSchema(connection: Connection) {
+export function getOffsuraSchema(connection: Connection) {
   if (!schema) {
     schema = buildSchema(connection);
   }

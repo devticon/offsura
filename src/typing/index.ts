@@ -1,4 +1,4 @@
-import { ColumnType } from "typeorm/browser";
+import { ColumnType } from "typeorm";
 
 const psqlToSqliteMap: Map<string, string> = new Map<string, string>();
 psqlToSqliteMap.set("timestamp with time zone", "datetime");
@@ -10,6 +10,6 @@ export function psqlToSqlite(type: string) {
   return psqlToSqliteMap.get(type) || type;
 }
 
-export function sqlToGraphql(type: ColumnType) {
-  return "String";
+export function sqlToGraphql(column: ColumnType, nullable): string {
+  return `String${nullable ? "" : "!"}`;
 }

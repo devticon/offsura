@@ -1,10 +1,9 @@
-import { SelectQueryBuilder } from "typeorm/browser";
-import { OrderByArg, StringExp, WhereArg } from "./interfaces";
-import { WhereExpression } from "typeorm/query-builder/WhereExpression";
 import {
   Brackets,
+  DeleteQueryBuilder,
   EntityMetadata,
   In,
+  InsertQueryBuilder,
   IsNull,
   LessThan,
   LessThanOrEqual,
@@ -12,29 +11,63 @@ import {
   MoreThan,
   MoreThanOrEqual,
   Not,
+  ObjectLiteral,
+  QueryBuilder as BaseQueryBuilder,
+  SelectQueryBuilder,
+  UpdateQueryBuilder,
 } from "typeorm/browser";
-import { GraphqlWhereExp } from "../../dist/src/graphql-compose-typeorm/applyWhereExp";
+import { StringExp, WhereArg } from "../interfaces";
+import { Equal } from "typeorm";
 
 enum ExpType {
   and = "_and",
   or = "_or",
 }
-export class ConnectionQueryBuilder<T = any> {
-  constructor(protected queryBuilder: SelectQueryBuilder<T>) {}
 
-  applyOrderBy(orderBy?: OrderByArg) {
-    if (!orderBy) {
-      for (const [column, sort] of Object.entries(orderBy)) {
-        this.queryBuilder.addOrderBy(column, sort);
-      }
-    }
-    return this;
+export abstract class QueryBuilder<T> {
+  protected queryBuilder:
+    | SelectQueryBuilder<T>
+    | InsertQueryBuilder<T>
+    | UpdateQueryBuilder<T>
+    | DeleteQueryBuilder<T>;
+  protected alias: string;
+
+  constructor(protected entityMetadata: EntityMetadata) {
+    this.alias = entityMetadata.name;
+    this.queryBuilder = this.getRepository().createQueryBuilder(this.alias);
+  }
+
+  toNative() {
+    return this.queryBuilder;
   }
 
   applyWhere(where: WhereArg) {
     for (const [column, exp] of Object.entries(where)) {
       this.applyColumnWhere(column, exp);
     }
+    return this;
+  }
+
+  applyPk(pk?: ObjectLiteral) {
+    if (this.queryBuilder instanceof InsertQueryBuilder) {
+      throw new Error("Cannot apply where to InsertQueryBuilder");
+    }
+    if (pk) {
+      for (const [column, value] of Object.entries(pk)) {
+        this.queryBuilder.andWhere({ [column]: Equal(value) } as any);
+      }
+    }
+    return this;
+  }
+
+  protected getRepository() {
+    return this.entityMetadata.connection.getRepository<T>(
+      this.entityMetadata.name
+    );
+  }
+
+  protected prefix(field: string) {
+    return `${this.entityMetadata.name}.${field}`;
   }
 
   private applyColumnWhere<T = any>(
@@ -42,10 +75,13 @@ export class ConnectionQueryBuilder<T = any> {
     exp: StringExp | StringExp[],
     type = ExpType.and
   ) {
+    if (this.queryBuilder instanceof InsertQueryBuilder) {
+      throw new Error("Cannot apply where to InsertQueryBuilder");
+    }
     if (column === ExpType.or || column === ExpType.and) {
       this.queryBuilder.where(
         new Brackets((_queryBuilder) => {
-          for (const _exp of exp as GraphqlWhereExp[]) {
+          for (const _exp of exp as StringExp[]) {
             for (const _column of Object.keys(_exp)) {
               this.applyColumnWhere(_column, _exp[_column], column as ExpType);
             }
@@ -56,8 +92,10 @@ export class ConnectionQueryBuilder<T = any> {
 
     const where = (parameters: any) => {
       if (type === ExpType.and) {
+        // @ts-ignore
         this.queryBuilder.andWhere(parameters);
       } else {
+        // @ts-ignore
         this.queryBuilder.orWhere(parameters);
       }
     };
@@ -103,12 +141,4 @@ export class ConnectionQueryBuilder<T = any> {
       }
     }
   }
-}
-
-export function createConnectionQueryBuilder(entityMetadata: EntityMetadata) {
-  return new ConnectionQueryBuilder(
-    entityMetadata.connection
-      .getRepository(entityMetadata.name)
-      .createQueryBuilder(entityMetadata.name)
-  );
 }

@@ -1,6 +1,6 @@
 import { initOffsura } from "../index";
 import { getConnection } from "typeorm/browser";
-import { getSchema } from "../schema";
+import { getOffsuraSchema } from "../schema";
 import { writeFileSync } from "fs";
 import { printSchema } from "graphql";
 import { tsImport } from "ts-import";
@@ -28,7 +28,7 @@ export async function generateSchema(config: OffsuraConfig) {
     { entities }
   );
   const connection = getConnection();
-  const schema = getSchema(connection);
+  const schema = getOffsuraSchema(connection);
   await connection.close();
   writeFileSync("schema.graphql", printSchema(schema));
 }

@@ -1,9 +1,12 @@
 import { initConnection } from "./db";
-import { graphql } from "graphql";
+import { ExecutionResult, graphql } from "graphql";
 import { setGlobalConfig } from "./config";
 import { OffsuraConfig, OffsuraRuntimeConfig } from "./interfaces";
-import { getSchema } from "./schema";
 import { Connection } from "typeorm/browser";
+import { getOffsuraSchema } from "./schema";
+export { startReplication } from "./typeorm-hasura-replication";
+export * from "./interfaces";
+export { getOffsuraSchema };
 
 let connection: Connection;
 export async function initOffsura(
@@ -14,12 +17,15 @@ export async function initOffsura(
   config.replication.webSocketImpl = runtimeConfig.webSocketImpl;
   setGlobalConfig(config);
   connection = await initConnection(config.typeorm);
-  getSchema(connection);
+  getOffsuraSchema(connection);
 
   return { connection };
 }
 
-export function offsura(source: string, variableValues = {}) {
-  const schema = getSchema(connection);
+export function offsura(
+  source: string,
+  variableValues = {}
+): Promise<ExecutionResult> {
+  const schema = getOffsuraSchema(connection);
   return graphql({ schema, source, variableValues });
 }

@@ -1,22 +1,12 @@
 query {
-     Product_connection (first: 15,
-         sort: name_asc){
+     Product_connection (first: 2
+         order_by: {name: asc}
+         after: "eyJuYW1lIjoiIUAjJCIsImlkIjoiZGYxYTBjYjAtNmViZi00MjczLTgxYzctZDkxZDdhYzRiMmRiIn0===="
+     ){
         edges {
             cursor
             node {
-                id
                 name
-                basePrice
-                categories_connection {
-                    edges {
-                        node {
-                            categoryId
-                            category {
-                                name
-                            }
-                        }
-                    }
-                }
             }
         }
         pageInfo {

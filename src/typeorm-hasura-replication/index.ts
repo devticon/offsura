@@ -6,10 +6,13 @@ import {
   SubscribeResult,
 } from "./interfaces";
 import { naming } from "../naming";
-import { BehaviorSubject, from, merge } from "rxjs";
-import { concatMap, filter, switchMap, tap } from "rxjs/operators";
+import { BehaviorSubject, from, merge, Subject } from "rxjs";
+import { concatMap, filter, share, switchMap, tap } from "rxjs/operators";
 import { ReplicationCursor } from "../entities/ReplicationCursor";
 import { HasuraClient } from "./hasuraClient";
+
+const replicasSubject = new Subject();
+export const replicas$ = replicasSubject.pipe(share());
 
 function decodeNode(node: ObjectLiteral) {
   if (node.id) {
@@ -54,7 +57,7 @@ function saveResults(
 ) {
   return connection
     .transaction(async (trx) => {
-      await trx.getRepository(meta.name).save(
+      const entities = await trx.getRepository(meta.name).save(
         nodes.map((node) => {
           return connection.getRepository(meta.name).create(decodeNode(node));
         })
@@ -66,9 +69,9 @@ function saveResults(
         })
       );
 
-      return { meta, error: undefined };
+      return { meta, entities, error: undefined };
     })
-    .catch((error) => ({ error, meta }));
+    .catch((error) => ({ error, meta, entities: [] }));
 }
 
 function handleError(meta: EntityMetadata, error?: any) {
@@ -101,7 +104,12 @@ export async function startReplication(
   merge(...Object.values(subscriptions).map(({ $ }) => $))
     .pipe(
       concatMap((results) => saveResults(connection, results)),
-      tap(({ error, meta }) => handleError(meta, error)),
+      tap(({ error, meta, entities }) => {
+        if (error) {
+          handleError(meta, error);
+        }
+        entities.forEach((entity) => replicasSubject.next(entity));
+      }),
       tap(({ meta }) => {
         subscriptions[meta.name].subject$.next(meta.name);
       })
