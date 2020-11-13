@@ -167,7 +167,8 @@ export class EntityGenerator {
       decorators.push(index);
     }
 
-    return `${imports}\n\n${decorators.join("\n")}\nexport class ${
+    const ignore = `/* tslint:disable */\n/* eslint-disable */\n// @ts-nocheck`;
+    return `${ignore}\n${imports}\n\n${decorators.join("\n")}\nexport class ${
       this.params.name
     }${extend}{\n${fields}\n}`;
   }
