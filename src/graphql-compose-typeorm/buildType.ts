@@ -123,14 +123,14 @@ export function buildType(entityMetadata: EntityMetadata) {
   otc.setField("id", {
     type: "String!",
     resolve(source) {
-      return Buffer.from(
-        JSON.stringify({
-          type: entityMetadata.tableName,
-          id: entityMetadata.connection
-            .getRepository(entityMetadata.tableName)
-            .getId(source),
-        })
-      ).toString("base64");
+      const primary = entityMetadata.connection
+        .getRepository(entityMetadata.tableName)
+        .getId(source);
+      const ids =
+        typeof primary === "object" ? Object.values(primary) : [primary];
+
+      const payload = [1, "public", entityMetadata.tableName, ...ids];
+      return Buffer.from(JSON.stringify(payload)).toString("base64");
     },
   });
 
